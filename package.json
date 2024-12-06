@@ -2,6 +2,12 @@
   "name": "texpress",
   "version": "0.0.0",
   "type": "module",
+  "peerDependencies": {
+    "@sinclair/typebox": ">=0.32.0",
+    "ajv": ">=8.0.0",
+    "ajv-formats": ">=3.0.1",
+    "express": ">=4.0.0"
+  },
   "scripts": {
     "test": "vitest",
     "test:coverage": "vitest --coverage",
@@ -11,6 +17,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.14.0",
+    "@types/express": "^5.0.0",
     "@types/node": "20.17.6",
     "@vitest/coverage-v8": "2.1.4",
     "@vitest/eslint-plugin": "1.1.7",
