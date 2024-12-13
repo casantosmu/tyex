@@ -3,37 +3,54 @@ import type Ajv from "ajv";
 import type { RouteDefinition, Method } from "./types";
 
 export class TExpress {
-  readonly ajv: Ajv;
   readonly express: Express;
+  readonly ajv: Ajv;
 
   constructor(express: Express, ajv: Ajv) {
     this.express = express;
     this.ajv = ajv;
   }
 
-  get(path: string, def: RouteDefinition, handler: RequestHandler) {
-    return this.#route("get", path, def, handler);
+  get(
+    path: string,
+    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
+  ) {
+    return this.#route("get", path, args);
   }
 
-  post(path: string, def: RouteDefinition, handler: RequestHandler) {
-    return this.#route("post", path, def, handler);
+  post(
+    path: string,
+    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
+  ) {
+    return this.#route("post", path, args);
   }
 
-  put(path: string, def: RouteDefinition, handler: RequestHandler) {
-    return this.#route("put", path, def, handler);
+  put(
+    path: string,
+    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
+  ) {
+    return this.#route("put", path, args);
   }
 
-  delete(path: string, def: RouteDefinition, handler: RequestHandler) {
-    return this.#route("delete", path, def, handler);
+  delete(
+    path: string,
+    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
+  ) {
+    return this.#route("delete", path, args);
   }
 
   #route(
     method: Method,
     path: string,
-    def: RouteDefinition,
-    handler: RequestHandler,
+    args: [...RequestHandler[], RouteDefinition, RequestHandler],
   ) {
-    this.express[method](path, (req, res, next) => {
+    const handler = args.pop() as RequestHandler;
+    // const def =
+    args.pop();
+    //  as RouteDefinition;
+    const middlewares = args as RequestHandler[];
+
+    this.express[method](path, ...middlewares, (req, res, next) => {
       handler(req, res, next)?.catch(next);
     });
     return this;
