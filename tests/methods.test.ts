@@ -11,9 +11,15 @@ describe("TExpress methods", () => {
     const t = texpress();
     const json = { message: "success" };
 
-    t[method]("/test", { responses: {} }, (req, res) => {
-      res.json(json);
-    });
+    t[method](
+      "/test",
+      {
+        responses: {},
+      },
+      (req, res) => {
+        res.json(json);
+      },
+    );
 
     const response = await supertest(t.express)[method]("/test");
 
@@ -48,5 +54,54 @@ describe("TExpress methods", () => {
 
     expect(response.status).toBe(200);
     expect(order).toEqual([1, 2, 3]);
+  });
+
+  test("Should handle resolved promises on handlers", async () => {
+    const t = texpress();
+    const json = { message: "success" };
+
+    t.get(
+      "/test",
+      {
+        responses: {},
+      },
+      async (req, res) => {
+        await Promise.resolve();
+        res.json(json);
+      },
+    );
+
+    const response = await supertest(t.express).get("/test");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual(json);
+  });
+
+  test("Should handle rejected promises on handlers", async () => {
+    const t = texpress();
+    const app = t.express;
+    const error = new Error("rejection");
+
+    t.get(
+      "/test",
+      {
+        responses: {},
+      },
+      async (req, res) => {
+        await Promise.reject(error);
+        res.json({ message: "success" });
+      },
+    );
+
+    let errFound;
+    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      errFound = err;
+      next(err);
+    });
+
+    const response = await supertest(t.express).get("/test");
+
+    expect(response.status).toBe(500);
+    expect(errFound).toBe(error);
   });
 });

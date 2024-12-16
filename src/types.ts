@@ -1,4 +1,5 @@
 import type { TSchema } from "@sinclair/typebox";
+import type { Request, Response, NextFunction } from "express";
 
 export type Method = "get" | "post" | "put" | "delete";
 
@@ -21,3 +22,9 @@ export type ResponsesObject = Record<
 export interface RouteDefinition {
   responses: ResponsesObject;
 }
+
+export type Handler = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => void | Promise<void>;

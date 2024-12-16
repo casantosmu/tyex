@@ -1,6 +1,6 @@
 import type { RequestHandler, Express } from "express";
 import type Ajv from "ajv";
-import type { RouteDefinition, Method } from "./types";
+import type { RouteDefinition, Method, Handler } from "./types";
 
 export class TExpress {
   readonly express: Express;
@@ -11,30 +11,21 @@ export class TExpress {
     this.ajv = ajv;
   }
 
-  get(
-    path: string,
-    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
-  ) {
+  get(path: string, ...args: [...RequestHandler[], RouteDefinition, Handler]) {
     return this.#route("get", path, args);
   }
 
-  post(
-    path: string,
-    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
-  ) {
+  post(path: string, ...args: [...RequestHandler[], RouteDefinition, Handler]) {
     return this.#route("post", path, args);
   }
 
-  put(
-    path: string,
-    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
-  ) {
+  put(path: string, ...args: [...RequestHandler[], RouteDefinition, Handler]) {
     return this.#route("put", path, args);
   }
 
   delete(
     path: string,
-    ...args: [...RequestHandler[], RouteDefinition, RequestHandler]
+    ...args: [...RequestHandler[], RouteDefinition, Handler]
   ) {
     return this.#route("delete", path, args);
   }
@@ -42,9 +33,9 @@ export class TExpress {
   #route(
     method: Method,
     path: string,
-    args: [...RequestHandler[], RouteDefinition, RequestHandler],
+    args: [...RequestHandler[], RouteDefinition, Handler],
   ) {
-    const handler = args.pop() as RequestHandler;
+    const handler = args.pop() as Handler;
     // const def =
     args.pop();
     //  as RouteDefinition;
