@@ -3,6 +3,8 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { TExpress } from "./texpress";
 
+export { TExpressError, ValidationError } from "./errors";
+
 interface Options {
   ajv?: Ajv;
 }
