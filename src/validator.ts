@@ -8,6 +8,7 @@ import { isEmptyObj, validate } from "./utils";
 
 interface Validation {
   path: ValidateFunction | null;
+  query: ValidateFunction | null;
 }
 
 export class Validator {
@@ -42,15 +43,22 @@ interface ParamSchema {
 
 interface ParamsSchemas {
   path: ParamSchema;
+  query: ParamSchema;
 }
 
 const buildValidation = (ajv: Ajv, def: RouteDefinition) => {
   const validation: Validation = {
     path: null,
+    query: null,
   };
   if (def.parameters) {
     const schemas: ParamsSchemas = {
       path: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+      query: {
         type: "object",
         properties: {},
         required: [],
@@ -61,10 +69,16 @@ const buildValidation = (ajv: Ajv, def: RouteDefinition) => {
       if (parameter.in === "path" && parameter.schema) {
         schemas.path.properties[parameter.name] = parameter.schema;
         schemas.path.required.push(parameter.name);
+      } else if (parameter.in === "query" && parameter.schema) {
+        schemas.query.properties[parameter.name] = parameter.schema;
+        if (parameter.required) {
+          schemas.query.required.push(parameter.name);
+        }
       }
     }
 
     validation.path = ajv.compile(schemas.path);
+    validation.query = ajv.compile(schemas.query);
   }
 
   return validation;
@@ -81,6 +95,12 @@ const validateRequest = (
     const error = validate(validation.path, req.params);
     if (error) {
       errors.path = error;
+    }
+  }
+  if (validation.query) {
+    const error = validate(validation.query, req.query);
+    if (error) {
+      errors.query = error;
     }
   }
 
