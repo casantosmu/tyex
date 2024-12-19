@@ -4,6 +4,7 @@ import addFormats from "ajv-formats";
 import { TExpress } from "./texpress";
 
 export { TExpressError, ValidationError } from "./errors";
+export { Options } from "./typebox";
 
 interface Options {
   ajv?: Ajv;
