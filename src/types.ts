@@ -41,6 +41,11 @@ export interface RouteDefinition<
   Params extends ParameterObject[] = ParameterObject[],
 > {
   parameters?: Params;
+  requestBody?: {
+    description?: string;
+    content: ContentObject;
+    required?: boolean;
+  };
   responses: ResponsesObject;
 }
 

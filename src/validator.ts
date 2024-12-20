@@ -3,12 +3,17 @@ import type Ajv from "ajv";
 import type { ValidateFunction } from "ajv";
 import type { TSchema } from "@sinclair/typebox";
 import type { RouteDefinition } from "./types";
-import { ValidationError, type ErrorDetails } from "./errors";
+import {
+  UnsupportedMediaTypeError,
+  ValidationError,
+  type ErrorDetails,
+} from "./errors";
 import { isEmptyObj, validate } from "./utils";
 
 interface Validation {
   path: ValidateFunction | null;
   query: ValidateFunction | null;
+  body: Map<string, ValidateFunction>;
 }
 
 export class Validator {
@@ -50,6 +55,7 @@ const buildValidation = (ajv: Ajv, def: RouteDefinition) => {
   const validation: Validation = {
     path: null,
     query: null,
+    body: new Map<string, ValidateFunction>(),
   };
   if (def.parameters) {
     const schemas: ParamsSchemas = {
@@ -80,6 +86,14 @@ const buildValidation = (ajv: Ajv, def: RouteDefinition) => {
     validation.path = ajv.compile(schemas.path);
     validation.query = ajv.compile(schemas.query);
   }
+  if (def.requestBody) {
+    const content = def.requestBody.content;
+    for (const [contentType, value] of Object.entries(content)) {
+      if (value.schema) {
+        validation.body.set(contentType, ajv.compile(value.schema));
+      }
+    }
+  }
 
   return validation;
 };
@@ -91,6 +105,23 @@ const validateRequest = (
 ) => {
   const errors: ErrorDetails = {};
 
+  if (def.requestBody) {
+    const contentType = req.get("Content-Type") ?? "unknown_content_type";
+    // TODO:
+    // - handle requests that match multiple keys (ej: 'application/*')
+    // - handle multipart/form-data
+    const bodyValidation = validation.body.get(contentType);
+    if (!bodyValidation) {
+      throw new UnsupportedMediaTypeError(contentType);
+    }
+
+    if (def.requestBody.required || !isEmptyObj(req.body)) {
+      const error = validate(bodyValidation, req.body);
+      if (error) {
+        errors.body = error;
+      }
+    }
+  }
   if (validation.path) {
     const error = validate(validation.path, req.params);
     if (error) {

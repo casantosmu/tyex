@@ -25,6 +25,16 @@ export class TExpressError extends Error {
   }
 }
 
+export class UnsupportedMediaTypeError extends TExpressError {
+  constructor(contentType: string) {
+    super(
+      415,
+      "INVALID_CONTENT_TYPE",
+      `Unsupported Content-Type: ${contentType}`,
+    );
+  }
+}
+
 export class ValidationError extends TExpressError {
   constructor(errors: ErrorDetails) {
     super(400, "VALIDATION_ERROR", "Validation failed", errors);

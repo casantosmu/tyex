@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import bodyParser from "body-parser";
 import supertest from "supertest";
 import { Type } from "@sinclair/typebox";
 import { errorHandler } from "./utils/error.handler";
@@ -487,6 +488,504 @@ describe("Request Validation", () => {
           ],
         },
       });
+    });
+  });
+
+  describe("Request Body", () => {
+    test("Should validate valid request body", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+
+      t.post(
+        "/users",
+        {
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  email: Type.String({ format: "email" }),
+                  name: Type.Optional(Type.String()),
+                }),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    email: Type.String(),
+                    name: Type.Optional(Type.String()),
+                  }),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).json(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const body = {
+        name: "John Doe",
+        email: "john@example.com",
+      };
+
+      const response = await supertest(t.express).post("/users").send(body);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toStrictEqual(body);
+    });
+
+    test("Should reject request with missing required fields", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+
+      t.post(
+        "/users",
+        {
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  email: Type.String({ format: "email" }),
+                  name: Type.Optional(Type.String()),
+                }),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    email: Type.String(),
+                    name: Type.Optional(Type.String()),
+                  }),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).json(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const payload = {
+        name: "John Doe",
+      };
+
+      const response = await supertest(t.express).post("/users").send(payload);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toStrictEqual({
+        message: "Validation failed",
+        code: "VALIDATION_ERROR",
+        details: {
+          body: [
+            {
+              instancePath: "",
+              keyword: "required",
+              message: "must have required property 'email'",
+              params: {
+                missingProperty: "email",
+              },
+              schemaPath: "#/required",
+            },
+          ],
+        },
+      });
+    });
+
+    test("Should reject request with invalid field types", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+
+      t.post(
+        "/users",
+        {
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  email: Type.String({ format: "email" }),
+                  name: Type.Optional(Type.String()),
+                }),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    email: Type.String(),
+                    name: Type.Optional(Type.String()),
+                  }),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).json(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const payload = {
+        email: "invalid-email",
+      };
+
+      const response = await supertest(t.express).post("/users").send(payload);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toStrictEqual({
+        message: "Validation failed",
+        code: "VALIDATION_ERROR",
+        details: {
+          body: [
+            {
+              instancePath: "/email",
+              keyword: "format",
+              message: 'must match format "email"',
+              params: {
+                format: "email",
+              },
+              schemaPath: "#/properties/email/format",
+            },
+          ],
+        },
+      });
+    });
+
+    test("Should allow empty body when optional", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+
+      t.post(
+        "/users",
+        {
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  email: Type.String({ format: "email" }),
+                  name: Type.Optional(Type.String()),
+                }),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    email: Type.String(),
+                    name: Type.Optional(Type.String()),
+                  }),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).json(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const payload = {};
+
+      const response = await supertest(t.express).post("/users").send(payload);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toStrictEqual(payload);
+    });
+
+    test("Should validate optional body when provided", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+
+      t.post(
+        "/users",
+        {
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  email: Type.String({ format: "email" }),
+                  name: Type.Optional(Type.String()),
+                }),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    email: Type.String(),
+                    name: Type.Optional(Type.String()),
+                  }),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).json(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const payload = {
+        name: "John Doe",
+      };
+
+      const response = await supertest(t.express).post("/users").send(payload);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toStrictEqual({
+        message: "Validation failed",
+        code: "VALIDATION_ERROR",
+        details: {
+          body: [
+            {
+              instancePath: "",
+              keyword: "required",
+              message: "must have required property 'email'",
+              params: {
+                missingProperty: "email",
+              },
+              schemaPath: "#/required",
+            },
+          ],
+        },
+      });
+    });
+
+    test("Should reject empty body when required", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+
+      t.post(
+        "/users",
+        {
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  email: Type.String({ format: "email" }),
+                  name: Type.Optional(Type.String()),
+                }),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    email: Type.String(),
+                    name: Type.Optional(Type.String()),
+                  }),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).json(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const payload = {};
+
+      const response = await supertest(t.express).post("/users").send(payload);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toStrictEqual({
+        message: "Validation failed",
+        code: "VALIDATION_ERROR",
+        details: {
+          body: [
+            {
+              instancePath: "",
+              keyword: "required",
+              message: "must have required property 'email'",
+              params: {
+                missingProperty: "email",
+              },
+              schemaPath: "#/required",
+            },
+          ],
+        },
+      });
+    });
+
+    test("Should reject request with unsupported Content-Type", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+
+      t.post(
+        "/users",
+        {
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  email: Type.String({ format: "email" }),
+                  name: Type.Optional(Type.String()),
+                }),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    email: Type.String(),
+                    name: Type.Optional(Type.String()),
+                  }),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).json(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const response = await supertest(t.express)
+        .post("/users")
+        .send("<user>John Doe</user>")
+        .set("Content-Type", "application/xml");
+
+      expect(response.status).toBe(415);
+      expect(response.body).toStrictEqual({
+        message: "Unsupported Content-Type: application/xml",
+        code: "INVALID_CONTENT_TYPE",
+        details: {},
+      });
+    });
+
+    test("Should handle text/plain content type", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+      t.express.use(bodyParser.text());
+
+      t.post(
+        "/comments",
+        {
+          requestBody: {
+            required: true,
+            content: {
+              "text/plain": {
+                schema: Type.String(),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "text/plain": {
+                  schema: Type.String(),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).send(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const body = "Hello World";
+
+      const response = await supertest(t.express)
+        .post("/comments")
+        .send(body)
+        .set("Content-Type", "text/plain");
+
+      expect(response.status).toBe(201);
+      expect(response.text).toStrictEqual(body);
+    });
+
+    test("Should handle text/plain and application/json content type", async () => {
+      const t = texpress();
+      t.express.use(bodyParser.json());
+      t.express.use(bodyParser.text());
+
+      t.post(
+        "/comments",
+        {
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: Type.Object({
+                  text: Type.String(),
+                }),
+              },
+              "text/plain": {
+                schema: Type.String(),
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Created",
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    text: Type.String(),
+                  }),
+                },
+                "text/plain": {
+                  schema: Type.String(),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.status(201).send(req.body);
+        },
+      );
+      t.express.use(errorHandler);
+
+      const body = "Hello World";
+
+      const response = await supertest(t.express)
+        .post("/comments")
+        .send(body)
+        .set("Content-Type", "text/plain");
+
+      expect(response.status).toBe(201);
+      expect(response.text).toStrictEqual(body);
     });
   });
 });
