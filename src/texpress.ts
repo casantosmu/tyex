@@ -2,10 +2,12 @@ import type { RequestHandler, Express } from "express";
 import type Ajv from "ajv";
 import type { RouteDefinition, Method, Handler } from "./types";
 import { Validator } from "./validator";
+import { Routes } from "./routes";
 
 export class TExpress {
   readonly express: Express;
   readonly ajv: Ajv;
+  readonly routes = new Routes();
   readonly #validator: Validator;
 
   constructor(express: Express, ajv: Ajv) {
