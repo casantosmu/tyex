@@ -40,6 +40,7 @@ export type ResponsesObject = Record<
 export interface RouteDefinition<
   Params extends ParameterObject[] = ParameterObject[],
 > {
+  summary?: string;
   parameters?: Params;
   requestBody?: {
     description?: string;
