@@ -1,9 +1,17 @@
 import type { RequestHandler, Express } from "express";
 import type Ajv from "ajv";
 import type { InfoObject, OpenAPIObject, PathsObject } from "openapi3-ts/oas30";
-import type { RouteDefinition, Method, Handler } from "./types";
-import { Validator } from "./validator";
+import type {
+  ParameterObject,
+  RouteDefinition,
+  Handler,
+  ReqHandler,
+  ResponsesObject,
+  ContentObject,
+  Method,
+} from "./types";
 import { Routes } from "./routes";
+import { Validator } from "./validator";
 
 export class TExpress {
   readonly express: Express;
@@ -36,21 +44,66 @@ export class TExpress {
     };
   }
 
-  get(path: string, ...args: [...RequestHandler[], RouteDefinition, Handler]) {
+  get<
+    const Params extends ParameterObject[],
+    Responses extends ResponsesObject,
+    ReqBodyContent extends ContentObject,
+    ReqBodyRequired extends boolean,
+  >(
+    path: string,
+    ...args: [
+      ...RequestHandler[],
+      RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+      Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+    ]
+  ) {
     return this.#route("get", path, args);
   }
 
-  post(path: string, ...args: [...RequestHandler[], RouteDefinition, Handler]) {
+  post<
+    const Params extends ParameterObject[],
+    Responses extends ResponsesObject,
+    ReqBodyContent extends ContentObject,
+    ReqBodyRequired extends boolean,
+  >(
+    path: string,
+    ...args: [
+      ...RequestHandler[],
+      RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+      Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+    ]
+  ) {
     return this.#route("post", path, args);
   }
 
-  put(path: string, ...args: [...RequestHandler[], RouteDefinition, Handler]) {
+  put<
+    const Params extends ParameterObject[],
+    Responses extends ResponsesObject,
+    ReqBodyContent extends ContentObject,
+    ReqBodyRequired extends boolean,
+  >(
+    path: string,
+    ...args: [
+      ...RequestHandler[],
+      RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+      Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+    ]
+  ) {
     return this.#route("put", path, args);
   }
 
-  delete(
+  delete<
+    const Params extends ParameterObject[],
+    Responses extends ResponsesObject,
+    ReqBodyContent extends ContentObject,
+    ReqBodyRequired extends boolean,
+  >(
     path: string,
-    ...args: [...RequestHandler[], RouteDefinition, Handler]
+    ...args: [
+      ...RequestHandler[],
+      RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+      Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+    ]
   ) {
     return this.#route("delete", path, args);
   }
@@ -58,9 +111,9 @@ export class TExpress {
   #route(
     method: Method,
     path: string,
-    args: [...RequestHandler[], RouteDefinition, Handler],
+    args: [...RequestHandler[], RouteDefinition, ReqHandler],
   ) {
-    const handler = args.pop() as Handler;
+    const handler = args.pop() as ReqHandler;
     const def = args.pop() as RouteDefinition;
     const middlewares = args as RequestHandler[];
 

@@ -701,6 +701,7 @@ describe("Request Validation", () => {
           },
         },
         (req, res) => {
+          // @ts-expect-error body is optional
           res.status(201).json(req.body);
         },
       );
@@ -746,6 +747,7 @@ describe("Request Validation", () => {
           },
         },
         (req, res) => {
+          // @ts-expect-error body is optional
           res.status(201).json(req.body);
         },
       );
