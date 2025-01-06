@@ -14,4 +14,63 @@ describe("Routes", () => {
       { method: "post", path: "/products", definition: def },
     ]);
   });
+
+  test("Should mount routes with prefix", () => {
+    const parent = new Routes();
+    const child = new Routes();
+    const def = { responses: {} };
+
+    child.add("get", "/users", def);
+    parent._addChild(child, "/api");
+
+    expect(parent.get()).toStrictEqual([
+      { method: "get", path: "/api/users", definition: def },
+    ]);
+  });
+
+  test("Should mount without prefix", () => {
+    const parent = new Routes();
+    const child = new Routes();
+    const def = { responses: {} };
+
+    child.add("get", "/users", def);
+    parent._addChild(child);
+
+    expect(parent.get()).toStrictEqual([
+      { method: "get", path: "/users", definition: def },
+    ]);
+  });
+
+  test("Should propagate new routes after mounting", () => {
+    const parent = new Routes();
+    const child = new Routes();
+    const def = { responses: {} };
+
+    parent._addChild(child, "/api");
+    child.add("get", "/users", def);
+    child.add("post", "/products", def);
+
+    expect(parent.get()).toStrictEqual([
+      { method: "get", path: "/api/users", definition: def },
+      { method: "post", path: "/api/products", definition: def },
+    ]);
+  });
+
+  test("Should handle multiple children with different prefixes", () => {
+    const parent = new Routes();
+    const firstChild = new Routes();
+    const secondChild = new Routes();
+    const def = { responses: {} };
+
+    parent._addChild(firstChild, "/api/v1");
+    parent._addChild(secondChild, "/api/v2");
+
+    firstChild.add("get", "/users", def);
+    secondChild.add("get", "/users", def);
+
+    expect(parent.get()).toStrictEqual([
+      { method: "get", path: "/api/v1/users", definition: def },
+      { method: "get", path: "/api/v2/users", definition: def },
+    ]);
+  });
 });
