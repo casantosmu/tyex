@@ -24,6 +24,7 @@ export class Router {
 
   _setup(texpress: TExpress, prefix?: string) {
     this.#validator = new Validator(texpress.ajv);
+    texpress.routes._addChild(this.#routes, prefix);
     return this.#router;
   }
 

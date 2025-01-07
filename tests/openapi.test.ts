@@ -23,8 +23,9 @@ describe("Generate OpenAPI", () => {
 
   test("Should include route paths and methods in OpenAPI spec", () => {
     const t = texpress();
+    const router = texpress.Router();
 
-    t.get(
+    router.get(
       "/cats",
       {
         summary: "Get all cats",
@@ -48,7 +49,7 @@ describe("Generate OpenAPI", () => {
         res.json([]);
       },
     );
-    t.post(
+    router.post(
       "/cats",
       {
         summary: "Create a cat",
@@ -82,20 +83,22 @@ describe("Generate OpenAPI", () => {
         res.status(201).json({ id: 1, ...req.body });
       },
     );
+    t.use("/api", router);
 
     const spec = t.openapi({
       title: "Test API",
       version: "1.0.0",
     });
 
-    expect(spec.paths["/cats"]?.get?.summary).toBe("Get all cats");
-    expect(spec.paths["/cats"]?.post?.summary).toBe("Create a cat");
+    expect(spec.paths["/api/cats"]?.get?.summary).toBe("Get all cats");
+    expect(spec.paths["/api/cats"]?.post?.summary).toBe("Create a cat");
   });
 
   test("Should generate a valid OpenAPI 3.0 specification", async () => {
     const t = texpress();
+    const router = texpress.Router();
 
-    t.get(
+    router.get(
       "/pets",
       {
         summary: "List all pets",
@@ -135,7 +138,7 @@ describe("Generate OpenAPI", () => {
       },
     );
 
-    t.post(
+    router.post(
       "/pets",
       {
         summary: "Create a pet",
@@ -179,6 +182,7 @@ describe("Generate OpenAPI", () => {
         res.status(201).json({ id: 1, ...req.body });
       },
     );
+    t.use("/api", router);
 
     const spec = t.openapi({
       title: "Pet Store API",
