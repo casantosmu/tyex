@@ -1,7 +1,51 @@
 {
   "name": "texpress",
   "version": "0.0.0",
+  "description": "Type-safe Express.js routes with automatic OpenAPI documentation generation.",
   "type": "module",
+  "author": "Carlos Santos <contact@casantosmu.com>",
+  "license": "MIT",
+  "keywords": [
+    "express",
+    "typescript",
+    "validation",
+    "ajv",
+    "typebox",
+    "api",
+    "rest",
+    "types",
+    "schema",
+    "openapi"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casantosmu/texpress.git"
+  },
+  "bugs": {
+    "url": "https://github.com/casantosmu/texpress/issues"
+  },
+  "homepage": "https://github.com/casantosmu/texpress#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
   "peerDependencies": {
     "@sinclair/typebox": ">=0.32.0",
     "ajv": ">=8.0.0",
