@@ -54,7 +54,7 @@
   },
   "scripts": {
     "test": "vitest",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "vitest --coverage --coverage.include=\"src/**\"",
     "build": "tsup",
     "lint": "prettier . --check && eslint .",
     "typecheck": "tsc"
