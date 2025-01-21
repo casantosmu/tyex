@@ -55,7 +55,7 @@
   "scripts": {
     "test": "vitest",
     "test:coverage": "vitest --coverage --coverage.include=\"src/**\"",
-    "build": "tsup",
+    "build": "tsup && fix-tsup-cjs",
     "lint": "prettier . --check && eslint .",
     "typecheck": "tsc"
   },
@@ -69,6 +69,7 @@
     "@vitest/eslint-plugin": "1.1.7",
     "body-parser": "^1.20.3",
     "eslint": "9.17.0",
+    "fix-tsup-cjs": "^1.2.0",
     "openapi3-ts": "^4.4.0",
     "prettier": "3.4.2",
     "supertest": "^7.0.0",
