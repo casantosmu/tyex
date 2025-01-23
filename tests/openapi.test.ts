@@ -2,11 +2,11 @@ import { describe, expect, test } from "vitest";
 import { Type } from "@sinclair/typebox";
 import SwaggerParser from "@apidevtools/swagger-parser";
 
-import texpress from "../src";
+import tyex from "../src";
 
 describe("Generate OpenAPI", () => {
   test("Should generate OpenAPI specification with correct info", () => {
-    const t = texpress();
+    const t = tyex();
 
     const info = {
       title: "Test API",
@@ -22,8 +22,8 @@ describe("Generate OpenAPI", () => {
   });
 
   test("Should include route paths and methods in OpenAPI spec", () => {
-    const t = texpress();
-    const router = texpress.Router();
+    const t = tyex();
+    const router = tyex.Router();
 
     router.get(
       "/cats",
@@ -95,8 +95,8 @@ describe("Generate OpenAPI", () => {
   });
 
   test("Should generate a valid OpenAPI 3.0 specification", async () => {
-    const t = texpress();
-    const router = texpress.Router();
+    const t = tyex();
+    const router = tyex.Router();
 
     router.get(
       "/pets",

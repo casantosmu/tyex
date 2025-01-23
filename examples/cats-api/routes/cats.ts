@@ -1,8 +1,8 @@
 import { Type, type Static } from "@sinclair/typebox";
-import texpress, { Options } from "../../../src";
+import tyex, { Options } from "../../../src";
 import { Cat, Error } from "./dtos";
 
-const router = texpress.Router();
+const router = tyex.Router();
 
 const cats: Static<typeof Cat>[] = [
   { id: 1, name: "Whiskers", breed: "Persian", age: 5 },

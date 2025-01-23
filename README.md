@@ -1,11 +1,11 @@
-# texpress 🚀
+# tyex 🚀
 
 Type-safe Express.js routes with automatic OpenAPI documentation generation. Zero config, zero hassle.
 
-![npm](https://img.shields.io/npm/v/texpress)
-![license](https://img.shields.io/npm/l/texpress)
+![npm](https://img.shields.io/npm/v/tyex)
+![license](https://img.shields.io/npm/l/tyex)
 
-## Why texpress?
+## Why tyex?
 
 - ✨ **Full Type Safety**: Leverage TypeScript's type system for your Express routes
 - 📚 **Automatic OpenAPI**: Generate OpenAPI documentation directly from your route definitions
@@ -18,10 +18,10 @@ Type-safe Express.js routes with automatic OpenAPI documentation generation. Zer
 ```typescript
 import { Type } from "@sinclair/typebox";
 import express from "express";
-import texpress from "texpress";
+import tyex from "tyex";
 
 const app = express();
-const t = texpress(app);
+const t = tyex(app);
 
 // Define your route with types and documentation in one place
 t.get(
@@ -56,7 +56,7 @@ const docs = t.openapi({
 ## Installation
 
 ```bash
-npm install express @sinclair/typebox ajv texpress
+npm install express @sinclair/typebox ajv tyex
 ```
 
 ## Examples

@@ -4,12 +4,12 @@ import supertest from "supertest";
 import { Type } from "@sinclair/typebox";
 import { errorHandler } from "./utils/error.handler";
 
-import texpress, { Options } from "../src";
+import tyex, { Options } from "../src";
 
 describe("Request Validation", () => {
   describe("Path Parameters", () => {
     test("Should validate required path parameters are present", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/users/:id",
@@ -51,7 +51,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject invalid path parameter type", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/users/:id",
@@ -107,7 +107,7 @@ describe("Request Validation", () => {
     });
 
     test("Should validate multiple path parameters", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/posts/:id/:slug",
@@ -159,7 +159,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject when one of multiple parameters is invalid (too short)", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/posts/:id/:slug",
@@ -229,7 +229,7 @@ describe("Request Validation", () => {
 
   describe("Query Parameters", () => {
     test("Should validate request with all valid query parameters", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/search",
@@ -308,7 +308,7 @@ describe("Request Validation", () => {
     });
 
     test("Should validate request with only required parameters", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/search",
@@ -358,7 +358,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject request with missing required parameter", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/search",
@@ -424,7 +424,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject request with invalid query parameter type", async () => {
-      const t = texpress();
+      const t = tyex();
 
       t.get(
         "/search",
@@ -493,7 +493,7 @@ describe("Request Validation", () => {
 
   describe("Request Body", () => {
     test("Should validate valid request body", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
 
       t.post(
@@ -542,7 +542,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject request with missing required fields", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
 
       t.post(
@@ -606,7 +606,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject request with invalid field types", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
 
       t.post(
@@ -670,7 +670,7 @@ describe("Request Validation", () => {
     });
 
     test("Should allow empty body when optional", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
 
       t.post(
@@ -716,7 +716,7 @@ describe("Request Validation", () => {
     });
 
     test("Should validate optional body when provided", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
 
       t.post(
@@ -780,7 +780,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject empty body when required", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
 
       t.post(
@@ -842,7 +842,7 @@ describe("Request Validation", () => {
     });
 
     test("Should reject request with unsupported Content-Type", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
 
       t.post(
@@ -893,7 +893,7 @@ describe("Request Validation", () => {
     });
 
     test("Should handle text/plain content type", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
       t.express.use(bodyParser.text());
 
@@ -937,7 +937,7 @@ describe("Request Validation", () => {
     });
 
     test("Should handle text/plain and application/json content type", async () => {
-      const t = texpress();
+      const t = tyex();
       t.express.use(bodyParser.json());
       t.express.use(bodyParser.text());
 

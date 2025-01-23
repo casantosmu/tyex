@@ -14,7 +14,7 @@ import { Router } from "./router";
 import { Routes } from "./routes";
 import { Validator } from "./validator";
 
-export class TExpress {
+export class TYEx {
   readonly ajv: Ajv;
   readonly express: Express;
   readonly routes = new Routes();

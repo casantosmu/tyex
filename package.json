@@ -1,5 +1,5 @@
 {
-  "name": "texpress",
+  "name": "tyex",
   "version": "0.0.0",
   "description": "Type-safe Express.js routes with automatic OpenAPI documentation generation.",
   "type": "module",
@@ -19,12 +19,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/casantosmu/texpress.git"
+    "url": "git+https://github.com/casantosmu/tyex.git"
   },
   "bugs": {
-    "url": "https://github.com/casantosmu/texpress/issues"
+    "url": "https://github.com/casantosmu/tyex/issues"
   },
-  "homepage": "https://github.com/casantosmu/texpress#readme",
+  "homepage": "https://github.com/casantosmu/tyex#readme",
   "engines": {
     "node": ">=20.0.0"
   },

@@ -3,13 +3,13 @@ import supertest from "supertest";
 import type { NextFunction, Request, Response } from "express";
 import { Type } from "@sinclair/typebox";
 
-import texpress from "../src";
+import tyex from "../src";
 
-describe("TExpress methods", () => {
+describe("TYEx methods", () => {
   const methods = ["get", "post", "put", "delete"] as const;
 
   test.each(methods)("Should handle %s requests", async (method) => {
-    const t = texpress();
+    const t = tyex();
     const json = { message: "success" };
 
     t[method](
@@ -38,7 +38,7 @@ describe("TExpress methods", () => {
   });
 
   test("Should execute middlewares in order", async () => {
-    const t = texpress();
+    const t = tyex();
     const order: number[] = [];
 
     t.get(
@@ -67,7 +67,7 @@ describe("TExpress methods", () => {
   });
 
   test("Should handle resolved promises on handlers", async () => {
-    const t = texpress();
+    const t = tyex();
     const json = { message: "success" };
 
     t.get(
@@ -97,7 +97,7 @@ describe("TExpress methods", () => {
   });
 
   test("Should handle rejected promises on handlers", async () => {
-    const t = texpress();
+    const t = tyex();
     const app = t.express;
     const error = new Error("rejection");
 
@@ -138,8 +138,8 @@ describe("Router methods", () => {
   const methods = ["get", "post", "put", "delete"] as const;
 
   test.each(methods)("Should handle %s requests", async (method) => {
-    const t = texpress();
-    const router = texpress.Router();
+    const t = tyex();
+    const router = tyex.Router();
     t.use(router);
 
     const json = { message: "success" };
@@ -170,8 +170,8 @@ describe("Router methods", () => {
   });
 
   test("Should execute middlewares in order", async () => {
-    const t = texpress();
-    const router = texpress.Router();
+    const t = tyex();
+    const router = tyex.Router();
     t.use(router);
 
     const order: number[] = [];
@@ -202,8 +202,8 @@ describe("Router methods", () => {
   });
 
   test("Should handle resolved promises on handlers", async () => {
-    const t = texpress();
-    const router = texpress.Router();
+    const t = tyex();
+    const router = tyex.Router();
     t.use(router);
 
     const json = { message: "success" };
@@ -235,9 +235,9 @@ describe("Router methods", () => {
   });
 
   test("Should handle rejected promises on handlers", async () => {
-    const t = texpress();
+    const t = tyex();
     const app = t.express;
-    const router = texpress.Router();
+    const router = tyex.Router();
     t.use(router);
 
     const error = new Error("rejection");

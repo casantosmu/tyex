@@ -3,16 +3,16 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
 import { Router } from "./router";
-import { TExpress } from "./texpress";
+import { TYEx } from "./tyex";
 
-export { TExpressError, ValidationError } from "./errors";
+export { TYExError, ValidationError } from "./errors";
 export { Options } from "./typebox";
 
 interface Options {
   ajv?: Ajv;
 }
 
-export default function texpress(app?: Express, options?: Options) {
+export default function tyex(app?: Express, options?: Options) {
   if (!app) {
     app = express();
   }
@@ -46,9 +46,9 @@ export default function texpress(app?: Express, options?: Options) {
     );
   }
 
-  return new TExpress(app, ajv);
+  return new TYEx(app, ajv);
 }
 
-texpress.Router = () => {
+tyex.Router = () => {
   return new Router(express.Router());
 };

@@ -9,7 +9,7 @@ import type {
   Method,
 } from "./types";
 import type { RequestHandler } from "express";
-import type { TExpress } from "./texpress";
+import type { TYEx } from "./tyex";
 import { Routes } from "./routes";
 import { Validator } from "./validator";
 
@@ -22,9 +22,9 @@ export class Router {
     this.#router = router;
   }
 
-  _setup(texpress: TExpress, prefix?: string) {
-    this.#validator = new Validator(texpress.ajv);
-    texpress.routes._addChild(this.#routes, prefix);
+  _setup(tyex: TYEx, prefix?: string) {
+    this.#validator = new Validator(tyex.ajv);
+    tyex.routes._addChild(this.#routes, prefix);
     return this.#router;
   }
 

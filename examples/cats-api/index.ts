@@ -1,11 +1,11 @@
 import express from "express";
-import texpress from "../../src";
+import tyex from "../../src";
 import catsRoutes from "./routes/cats";
 import { errorHandler } from "./errorHandler";
 
 const app = express();
 
-const t = texpress(app);
+const t = tyex(app);
 app.use(express.json());
 
 t.use("/api/cats", catsRoutes);
