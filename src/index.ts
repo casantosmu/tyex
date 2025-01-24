@@ -3,9 +3,9 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
 import { Router } from "./router";
-import { TYEx } from "./tyex";
+import { Tyex } from "./tyex";
 
-export { TYExError, ValidationError } from "./errors";
+export { TyexError, ValidationError } from "./errors";
 export { Options } from "./typebox";
 
 interface Options {
@@ -46,7 +46,7 @@ export default function tyex(app?: Express, options?: Options) {
     );
   }
 
-  return new TYEx(app, ajv);
+  return new Tyex(app, ajv);
 }
 
 tyex.Router = () => {

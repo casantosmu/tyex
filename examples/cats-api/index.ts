@@ -4,8 +4,8 @@ import catsRoutes from "./routes/cats";
 import { errorHandler } from "./errorHandler";
 
 const app = express();
-
 const t = tyex(app);
+
 app.use(express.json());
 
 t.use("/api/cats", catsRoutes);

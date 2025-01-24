@@ -7,7 +7,7 @@ export interface ErrorDetails {
   [key: string]: unknown;
 }
 
-export class TYExError extends Error {
+export class TyexError extends Error {
   status: number;
   code: string;
   details: ErrorDetails;
@@ -25,7 +25,7 @@ export class TYExError extends Error {
   }
 }
 
-export class UnsupportedMediaTypeError extends TYExError {
+export class UnsupportedMediaTypeError extends TyexError {
   constructor(contentType: string) {
     super(
       415,
@@ -35,7 +35,7 @@ export class UnsupportedMediaTypeError extends TYExError {
   }
 }
 
-export class ValidationError extends TYExError {
+export class ValidationError extends TyexError {
   constructor(errors: ErrorDetails) {
     super(400, "VALIDATION_ERROR", "Validation failed", errors);
   }

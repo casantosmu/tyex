@@ -5,7 +5,7 @@ import { Type } from "@sinclair/typebox";
 
 import tyex from "../src";
 
-describe("TYEx methods", () => {
+describe("methods", () => {
   const methods = ["get", "post", "put", "delete"] as const;
 
   test.each(methods)("Should handle %s requests", async (method) => {
