@@ -57,7 +57,8 @@
     "test:coverage": "vitest --coverage --coverage.include=\"src/**\"",
     "build": "tsup && fix-tsup-cjs",
     "lint": "prettier . --check && eslint .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "prepublishOnly": "npm run test && npm run lint && npm run typecheck && npm run build"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.1",
