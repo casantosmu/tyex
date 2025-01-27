@@ -14,7 +14,7 @@ describe("Generate OpenAPI", () => {
       description: "Test API description",
     };
 
-    const spec = t.openapi(info);
+    const spec = t.openapi({ info });
 
     expect(spec.openapi).toBe("3.0.0");
     expect(spec.info).toStrictEqual(info);
@@ -86,8 +86,10 @@ describe("Generate OpenAPI", () => {
     t.use("/api", router);
 
     const spec = t.openapi({
-      title: "Test API",
-      version: "1.0.0",
+      info: {
+        title: "Test API",
+        version: "1.0.0",
+      },
     });
 
     expect(spec.paths["/api/cats"]?.get?.summary).toBe("Get all cats");
@@ -185,9 +187,11 @@ describe("Generate OpenAPI", () => {
     t.use("/api", router);
 
     const spec = t.openapi({
-      title: "Pet Store API",
-      version: "1.0.0",
-      description: "A sample Pet Store API",
+      info: {
+        title: "Pet Store API",
+        version: "1.0.0",
+        description: "A sample Pet Store API",
+      },
     });
 
     // @ts-expect-error OpenAPIObject and Document types does not match

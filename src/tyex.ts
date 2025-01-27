@@ -1,6 +1,6 @@
 import type { RequestHandler, Express } from "express";
 import type Ajv from "ajv";
-import type { InfoObject, OpenAPIObject, PathsObject } from "openapi3-ts/oas30";
+import type { OpenAPIObject, PathsObject } from "openapi3-ts/oas30";
 import type {
   ParameterObject,
   RouteDefinition,
@@ -26,7 +26,7 @@ export class Tyex {
     this.#validator = new Validator(ajv);
   }
 
-  openapi(info: InfoObject): OpenAPIObject {
+  openapi(doc: Omit<OpenAPIObject, "openapi" | "paths">): OpenAPIObject {
     const paths: PathsObject = {};
 
     for (const route of this.routes.get()) {
@@ -39,8 +39,8 @@ export class Tyex {
     }
 
     return {
+      ...doc,
       openapi: "3.0.0",
-      info,
       paths,
     };
   }

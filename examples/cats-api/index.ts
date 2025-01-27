@@ -10,7 +10,7 @@ app.use(express.json());
 
 t.use("/api/cats", catsRoutes);
 
-const docs = t.openapi({ title: "Cats API", version: "1.0.0" });
+const docs = t.openapi({ info: { title: "Cats API", version: "1.0.0" } });
 app.get("/api-docs/openapi.json", (req, res) => {
   res.json(docs);
 });
