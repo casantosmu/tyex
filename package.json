@@ -58,7 +58,7 @@
     "build": "tsup && fix-tsup-cjs",
     "lint": "prettier . --check && eslint .",
     "typecheck": "tsc",
-    "prepublishOnly": "npm run test && npm run lint && npm run typecheck && npm run build"
+    "prepublishOnly": "npm run test run && npm run lint && npm run typecheck && npm run build"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.1",

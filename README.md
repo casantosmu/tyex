@@ -48,8 +48,10 @@ t.get(
 
 // Get OpenAPI documentation
 const docs = t.openapi({
-  title: "My API",
-  version: "1.0.0",
+  info: {
+    title: "My API",
+    version: "1.0.0",
+  },
 });
 ```
 

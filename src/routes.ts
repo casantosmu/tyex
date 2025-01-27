@@ -15,7 +15,7 @@ export class Routes {
   #collection: Route[] = [];
   #children: Child[] = [];
 
-  get(): Route[] {
+  get() {
     const routes = [...this.#collection];
 
     for (const child of this.#children) {
