@@ -89,7 +89,7 @@ router.post(
       required: true,
       content: {
         "application/json": {
-          schema: Cat,
+          schema: Type.Omit(Cat, ["id"]),
         },
       },
     },

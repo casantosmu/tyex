@@ -4,6 +4,7 @@ Type-safe Express.js routes with automatic OpenAPI documentation generation. Zer
 
 ![npm](https://img.shields.io/npm/v/tyex)
 ![license](https://img.shields.io/npm/l/tyex)
+[![codecov](https://codecov.io/gh/casantosmu/tyex/graph/badge.svg?token=5IoSRdzqjN)](https://codecov.io/gh/casantosmu/tyex)
 
 ## Why tyex?
 
