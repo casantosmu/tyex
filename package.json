@@ -34,16 +34,17 @@
     "LICENSE",
     "README.md"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    },
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "peerDependencies": {
@@ -55,7 +56,7 @@
   "scripts": {
     "test": "vitest",
     "test:coverage": "vitest --coverage --coverage.include=\"src/**\"",
-    "build": "tsup && fix-tsup-cjs",
+    "build": "tsup",
     "lint": "prettier . --check && eslint .",
     "typecheck": "tsc",
     "prepublishOnly": "npm run test run && npm run lint && npm run typecheck && npm run build"
@@ -70,7 +71,6 @@
     "@vitest/eslint-plugin": "^1.1.25",
     "body-parser": "^1.20.3",
     "eslint": "^9.18.0",
-    "fix-tsup-cjs": "^1.2.0",
     "openapi3-ts": "^4.4.0",
     "prettier": "^3.4.2",
     "supertest": "^7.0.0",
