@@ -1,4 +1,4 @@
-import { type TSchema, CloneType } from "@sinclair/typebox";
+import { type Static, type TSchema, CloneType, Type } from "@sinclair/typebox";
 
 export type TOptions<
   Type extends TSchema,
@@ -11,3 +11,9 @@ export function Options<
 >(type: Type, options: Options): TOptions<Type, Options> {
   return CloneType(type, options) as never;
 }
+
+export const Nullable = <T extends TSchema>(schema: T) =>
+  Type.Unsafe<Static<T> | null>({
+    ...schema,
+    nullable: true,
+  });

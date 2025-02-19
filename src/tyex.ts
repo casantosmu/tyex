@@ -1,6 +1,5 @@
 import type { RequestHandler, Express } from "express";
 import type Ajv from "ajv";
-import type { OpenAPIObject, PathsObject } from "openapi3-ts/oas30";
 import type {
   ParameterObject,
   RouteDefinition,
@@ -9,6 +8,8 @@ import type {
   ResponsesObject,
   ContentObject,
   Method,
+  OpenAPI,
+  OpenAPIBase,
 } from "./types";
 import { Router } from "./router";
 import { Routes } from "./routes";
@@ -19,6 +20,7 @@ export class Tyex {
   readonly express: Express;
   readonly routes = new Routes();
   readonly #validator: Validator;
+  #openapi: OpenAPI | null = null;
 
   constructor(express: Express, ajv: Ajv) {
     this.express = express;
@@ -26,22 +28,30 @@ export class Tyex {
     this.#validator = new Validator(ajv);
   }
 
-  openapi(doc: Omit<OpenAPIObject, "openapi" | "paths">): OpenAPIObject {
-    const paths: PathsObject = {};
+  openapi(baseDoc: OpenAPIBase): RequestHandler {
+    return (req, res) => {
+      if (this.#openapi) {
+        return res.json(this.#openapi);
+      }
 
-    for (const route of this.routes.get()) {
-      const path = route.path.replace(/:([^/]+)/g, "{$1}");
+      const paths: Record<string, Record<string, unknown>> = {};
+      for (const route of this.routes.get()) {
+        const path = route.path.replace(/:([^/]+)/g, "{$1}");
 
-      paths[path] = {
-        ...paths[path],
-        [route.method]: route.definition,
+        paths[path] = {
+          ...paths[path],
+          [route.method]: route.definition,
+        };
+      }
+
+      const doc = {
+        ...baseDoc,
+        openapi: "3.0.0",
+        paths,
       };
-    }
 
-    return {
-      ...doc,
-      openapi: "3.0.0",
-      paths,
+      this.#openapi = doc;
+      res.json(doc);
     };
   }
 
@@ -69,6 +79,13 @@ export class Tyex {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  get(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  get(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("get", path, args);
   }
@@ -85,6 +102,13 @@ export class Tyex {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  post(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  post(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("post", path, args);
   }
@@ -101,6 +125,13 @@ export class Tyex {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  put(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  put(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("put", path, args);
   }
@@ -117,6 +148,13 @@ export class Tyex {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  delete(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  delete(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("delete", path, args);
   }
@@ -124,17 +162,36 @@ export class Tyex {
   #route(
     method: Method,
     path: string,
-    args: [...RequestHandler[], RouteDefinition, ReqHandler],
+    args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler],
   ) {
     const handler = args.pop() as ReqHandler;
-    const def = args.pop() as RouteDefinition;
-    const middlewares = args as RequestHandler[];
+    const lastArg = args.pop();
 
-    this.routes.add(method, path, def);
+    let routeDef: RouteDefinition = {
+      responses: {
+        default: {
+          description: "Unknown",
+        },
+      },
+    };
+    if (typeof lastArg === "object") {
+      routeDef = lastArg;
+    }
+
+    let middlewares = args as RequestHandler[];
+    if (lastArg && typeof lastArg !== "object") {
+      middlewares = [...args, lastArg] as RequestHandler[];
+    }
+
+    this.routes.add(method, path, routeDef);
+
     this.express[method](path, ...middlewares, (req, res, next) => {
-      this.#validator.validateRequest(req, method, path, def);
+      this.#validator.validateRequest(req, method, path, routeDef);
       handler(req, res, next)?.catch(next);
     });
+
     return this;
   }
 }

@@ -5,8 +5,9 @@ import addFormats from "ajv-formats";
 import { Router } from "./router";
 import { Tyex } from "./tyex";
 
+export type { Tyex };
 export { TyexError, ValidationError } from "./errors";
-export { Options } from "./typebox";
+export { Options, Nullable } from "./typebox";
 
 interface Options {
   ajv?: Ajv;
