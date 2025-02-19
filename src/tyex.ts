@@ -8,8 +8,8 @@ import type {
   ResponsesObject,
   ContentObject,
   Method,
-  OpenAPIBase,
   OpenAPI,
+  OpenAPIBase,
 } from "./types";
 import { Router } from "./router";
 import { Routes } from "./routes";
@@ -20,6 +20,7 @@ export class Tyex {
   readonly express: Express;
   readonly routes = new Routes();
   readonly #validator: Validator;
+  #openapi: OpenAPI | null = null;
 
   constructor(express: Express, ajv: Ajv) {
     this.express = express;
@@ -27,22 +28,30 @@ export class Tyex {
     this.#validator = new Validator(ajv);
   }
 
-  openapi(doc: OpenAPIBase): OpenAPI {
-    const paths: Record<string, Record<string, unknown>> = {};
+  openapi(baseDoc: OpenAPIBase): RequestHandler {
+    return (req, res) => {
+      if (this.#openapi) {
+        return res.json(this.#openapi);
+      }
 
-    for (const route of this.routes.get()) {
-      const path = route.path.replace(/:([^/]+)/g, "{$1}");
+      const paths: Record<string, Record<string, unknown>> = {};
+      for (const route of this.routes.get()) {
+        const path = route.path.replace(/:([^/]+)/g, "{$1}");
 
-      paths[path] = {
-        ...paths[path],
-        [route.method]: route.definition,
+        paths[path] = {
+          ...paths[path],
+          [route.method]: route.definition,
+        };
+      }
+
+      const doc = {
+        ...baseDoc,
+        openapi: "3.0.0",
+        paths,
       };
-    }
 
-    return {
-      ...doc,
-      openapi: "3.0.0",
-      paths,
+      this.#openapi = doc;
+      res.json(doc);
     };
   }
 

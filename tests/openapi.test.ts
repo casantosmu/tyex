@@ -1,29 +1,45 @@
 import { describe, expect, test } from "vitest";
 import { Type } from "@sinclair/typebox";
 import SwaggerParser from "@apidevtools/swagger-parser";
+import express from "express";
+import request from "supertest";
 
 import tyex from "../src";
 
-describe("Generate OpenAPI", () => {
-  test("Should generate OpenAPI specification with correct info", () => {
-    const t = tyex();
+describe("OpenAPI Middleware", () => {
+  test("Should serve OpenAPI specification with correct info", async () => {
+    const app = express();
+    const t = tyex(app);
 
     const info = {
       title: "Test API",
       version: "1.0.0",
       description: "Test API description",
     };
+    app.use("/openapi", t.openapi({ info }));
 
-    const spec = t.openapi({ info });
+    const response = await request(app)
+      .get("/openapi")
+      .expect("Content-Type", /json/)
+      .expect(200);
 
-    expect(spec.openapi).toBe("3.0.0");
-    expect(spec.info).toStrictEqual(info);
-    expect(spec.paths).toStrictEqual({});
+    expect(response.body).toStrictEqual({
+      openapi: "3.0.0",
+      info,
+      paths: {},
+    });
   });
 
-  test("Should include route paths and methods in OpenAPI spec", () => {
-    const t = tyex();
+  test("Should include route paths and methods in OpenAPI spec", async () => {
+    const app = express();
+    const t = tyex(app);
     const router = tyex.Router();
+
+    const info = {
+      title: "Test API",
+      version: "1.0.0",
+    };
+    app.use("/openapi", t.openapi({ info }));
 
     router.get(
       "/cats",
@@ -49,6 +65,7 @@ describe("Generate OpenAPI", () => {
         res.json([]);
       },
     );
+
     router.post(
       "/cats",
       {
@@ -84,20 +101,19 @@ describe("Generate OpenAPI", () => {
       },
     );
 
+    // Without definition
     router.put("/cats", (req, res) => {
       res.status(204).send();
     });
 
     t.use("/api", router);
 
-    const spec = t.openapi({
-      info: {
-        title: "Test API",
-        version: "1.0.0",
-      },
-    });
+    const response = await request(app)
+      .get("/openapi")
+      .expect("Content-Type", /json/)
+      .expect(200);
 
-    expect(spec).toStrictEqual({
+    expect(response.body).toStrictEqual({
       info: {
         title: "Test API",
         version: "1.0.0",
@@ -110,12 +126,17 @@ describe("Generate OpenAPI", () => {
               "200": {
                 content: {
                   "application/json": {
-                    schema: Type.Array(
-                      Type.Object({
-                        id: Type.Number(),
-                        name: Type.String(),
-                      }),
-                    ),
+                    schema: {
+                      items: {
+                        properties: {
+                          id: { type: "number" },
+                          name: { type: "string" },
+                        },
+                        required: ["id", "name"],
+                        type: "object",
+                      },
+                      type: "array",
+                    },
                   },
                 },
                 description: "List of cats",
@@ -127,10 +148,14 @@ describe("Generate OpenAPI", () => {
             requestBody: {
               content: {
                 "application/json": {
-                  schema: Type.Object({
-                    name: Type.String(),
-                    age: Type.Number(),
-                  }),
+                  schema: {
+                    properties: {
+                      age: { type: "number" },
+                      name: { type: "string" },
+                    },
+                    required: ["name", "age"],
+                    type: "object",
+                  },
                 },
               },
               required: true,
@@ -139,11 +164,15 @@ describe("Generate OpenAPI", () => {
               "201": {
                 content: {
                   "application/json": {
-                    schema: Type.Object({
-                      id: Type.Number(),
-                      name: Type.String(),
-                      age: Type.Number(),
-                    }),
+                    schema: {
+                      properties: {
+                        age: { type: "number" },
+                        id: { type: "number" },
+                        name: { type: "string" },
+                      },
+                      required: ["id", "name", "age"],
+                      type: "object",
+                    },
                   },
                 },
                 description: "Cat created",
@@ -164,8 +193,20 @@ describe("Generate OpenAPI", () => {
   });
 
   test("Should generate a valid OpenAPI 3.0 specification", async () => {
-    const t = tyex();
+    const app = express();
+    const t = tyex(app);
     const router = tyex.Router();
+
+    app.use(
+      "/openapi",
+      t.openapi({
+        info: {
+          title: "Pet Store API",
+          version: "1.0.0",
+          description: "A sample Pet Store API",
+        },
+      }),
+    );
 
     router.get(
       "/pets",
@@ -252,21 +293,17 @@ describe("Generate OpenAPI", () => {
       },
     );
 
+    // Without definition
     router.put("/pets", (req, res) => {
       res.status(204).send();
     });
 
     t.use("/api", router);
 
-    const spec = t.openapi({
-      info: {
-        title: "Pet Store API",
-        version: "1.0.0",
-        description: "A sample Pet Store API",
-      },
-    });
+    const response = await request(app).get("/openapi").expect(200);
 
-    const api = await SwaggerParser.validate(spec);
-    expect(api).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const valid = await SwaggerParser.validate(response.body);
+    expect(valid).toBeDefined();
   });
 });

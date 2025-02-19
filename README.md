@@ -18,14 +18,23 @@ Type-safe Express.js routes with automatic OpenAPI documentation generation. Zer
 
 ```typescript
 import { Type } from "@sinclair/typebox";
-import express from "express";
 import tyex from "tyex";
 
-const app = express();
-const t = tyex(app);
+const app = tyex();
+
+// Serve OpenAPI documentation
+app.express.use(
+  "/openapi.json",
+  app.openapi({
+    info: {
+      title: "My API",
+      version: "1.0.0",
+    },
+  }),
+);
 
 // Define your route with types and documentation in one place
-t.get(
+app.get(
   "/hello",
   {
     summary: "Say hello",
@@ -46,20 +55,12 @@ t.get(
     res.json({ message: "Hello, World!" });
   },
 );
-
-// Get OpenAPI documentation
-const docs = t.openapi({
-  info: {
-    title: "My API",
-    version: "1.0.0",
-  },
-});
 ```
 
 ## Installation
 
 ```bash
-npm install express @sinclair/typebox ajv tyex
+npm install tyex
 ```
 
 ## Examples
