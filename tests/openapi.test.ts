@@ -266,7 +266,6 @@ describe("Generate OpenAPI", () => {
       },
     });
 
-    // @ts-expect-error OpenAPIObject and Document types does not match
     const api = await SwaggerParser.validate(spec);
     expect(api).toBeDefined();
   });

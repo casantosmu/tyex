@@ -58,7 +58,6 @@ export interface RouteDefinition<
   };
   responses: Responses;
   deprecated?: boolean;
-  [extensionName: `x-${string}`]: unknown;
 }
 
 export type Handler<
@@ -113,3 +112,29 @@ export type ReqHandler = (
   res: Response,
   next: NextFunction,
 ) => void | Promise<void>;
+
+export interface OpenAPI {
+  openapi: string;
+  info: {
+    title: string;
+    description?: string;
+    termsOfService?: string;
+    contact?: {
+      name?: string;
+      url?: string;
+      email?: string;
+    };
+    license?: {
+      name: string;
+      url?: string;
+    };
+    version: string;
+  };
+  servers?: {
+    url: string;
+    description?: string;
+  }[];
+  paths: Record<string, Record<string, unknown>>;
+}
+
+export type OpenAPIBase = Omit<OpenAPI, "openapi" | "paths">;
