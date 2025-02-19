@@ -40,6 +40,13 @@ export class Router {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  get(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  get(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("get", path, args);
   }
@@ -56,6 +63,13 @@ export class Router {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  post(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  post(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("post", path, args);
   }
@@ -72,6 +86,13 @@ export class Router {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  put(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  put(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("put", path, args);
   }
@@ -88,6 +109,13 @@ export class Router {
       RouteDefinition<Params, Responses, ReqBodyContent, ReqBodyRequired>,
       Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
     ]
+  ): this;
+  delete(path: string, ...args: [...RequestHandler[], ReqHandler]): this;
+  delete(
+    path: string,
+    ...args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler]
   ) {
     return this.#route("delete", path, args);
   }
@@ -95,20 +123,39 @@ export class Router {
   #route(
     method: Method,
     path: string,
-    args: [...RequestHandler[], RouteDefinition, ReqHandler],
+    args:
+      | [...RequestHandler[], RouteDefinition, ReqHandler]
+      | [...RequestHandler[], ReqHandler],
   ) {
     const handler = args.pop() as ReqHandler;
-    const def = args.pop() as RouteDefinition;
-    const middlewares = args as RequestHandler[];
+    const lastArg = args.pop();
 
-    this.#routes.add(method, path, def);
+    let routeDef: RouteDefinition = {
+      responses: {
+        default: {
+          description: "Unknown",
+        },
+      },
+    };
+    if (typeof lastArg === "object") {
+      routeDef = lastArg;
+    }
+
+    let middlewares = args as RequestHandler[];
+    if (lastArg && typeof lastArg !== "object") {
+      middlewares = [...args, lastArg] as RequestHandler[];
+    }
+
+    this.#routes.add(method, path, routeDef);
+
     this.#router[method](path, ...middlewares, (req, res, next) => {
       if (!this.#validator) {
         throw new Error("router must be mounted before handling routes.");
       }
-      this.#validator.validateRequest(req, method, path, def);
+      this.#validator.validateRequest(req, method, path, routeDef);
       handler(req, res, next)?.catch(next);
     });
+
     return this;
   }
 }

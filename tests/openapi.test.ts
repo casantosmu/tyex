@@ -83,6 +83,11 @@ describe("Generate OpenAPI", () => {
         res.status(201).json({ id: 1, ...req.body });
       },
     );
+
+    router.put("/cats", (req, res) => {
+      res.status(204).send();
+    });
+
     t.use("/api", router);
 
     const spec = t.openapi({
@@ -92,8 +97,70 @@ describe("Generate OpenAPI", () => {
       },
     });
 
-    expect(spec.paths["/api/cats"]?.get?.summary).toBe("Get all cats");
-    expect(spec.paths["/api/cats"]?.post?.summary).toBe("Create a cat");
+    expect(spec).toStrictEqual({
+      info: {
+        title: "Test API",
+        version: "1.0.0",
+      },
+      openapi: "3.0.0",
+      paths: {
+        "/api/cats": {
+          get: {
+            responses: {
+              "200": {
+                content: {
+                  "application/json": {
+                    schema: Type.Array(
+                      Type.Object({
+                        id: Type.Number(),
+                        name: Type.String(),
+                      }),
+                    ),
+                  },
+                },
+                description: "List of cats",
+              },
+            },
+            summary: "Get all cats",
+          },
+          post: {
+            requestBody: {
+              content: {
+                "application/json": {
+                  schema: Type.Object({
+                    name: Type.String(),
+                    age: Type.Number(),
+                  }),
+                },
+              },
+              required: true,
+            },
+            responses: {
+              "201": {
+                content: {
+                  "application/json": {
+                    schema: Type.Object({
+                      id: Type.Number(),
+                      name: Type.String(),
+                      age: Type.Number(),
+                    }),
+                  },
+                },
+                description: "Cat created",
+              },
+            },
+            summary: "Create a cat",
+          },
+          put: {
+            responses: {
+              default: {
+                description: "Unknown",
+              },
+            },
+          },
+        },
+      },
+    });
   });
 
   test("Should generate a valid OpenAPI 3.0 specification", async () => {
@@ -184,6 +251,11 @@ describe("Generate OpenAPI", () => {
         res.status(201).json({ id: 1, ...req.body });
       },
     );
+
+    router.put("/pets", (req, res) => {
+      res.status(204).send();
+    });
+
     t.use("/api", router);
 
     const spec = t.openapi({
