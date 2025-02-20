@@ -4,7 +4,7 @@ import SwaggerParser from "@apidevtools/swagger-parser";
 import express from "express";
 import request from "supertest";
 
-import tyex from "../src";
+import tyex, { Nullable, Options } from "../src";
 
 describe("OpenAPI Middleware", () => {
   test("Should serve OpenAPI specification with correct info", async () => {
@@ -217,7 +217,9 @@ describe("OpenAPI Middleware", () => {
             name: "limit",
             in: "query",
             required: false,
-            schema: Type.Number(),
+            schema: Options(Type.Integer(), {
+              default: 10,
+            }),
           },
           {
             name: "type",
@@ -236,6 +238,7 @@ describe("OpenAPI Middleware", () => {
                     id: Type.Number(),
                     name: Type.String(),
                     type: Type.String(),
+                    description: Nullable(Type.String()),
                   }),
                 ),
               },

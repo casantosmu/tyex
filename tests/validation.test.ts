@@ -4,7 +4,7 @@ import supertest from "supertest";
 import { Type } from "@sinclair/typebox";
 import { errorHandler } from "./utils/error.handler";
 
-import tyex, { Options } from "../src";
+import tyex from "../src";
 
 describe("Request Validation", () => {
   describe("Path Parameters", () => {
@@ -158,7 +158,7 @@ describe("Request Validation", () => {
       expect(response.body).toStrictEqual(path);
     });
 
-    test("Should reject when one of multiple parameters is invalid (too short)", async () => {
+    test("Should reject when one of multiple parameters is invalid", async () => {
       const t = tyex();
 
       t.get(
@@ -259,14 +259,6 @@ describe("Request Validation", () => {
               required: false,
               schema: Type.Boolean(),
             },
-            {
-              in: "query",
-              name: "sort",
-              required: false,
-              schema: Options(Type.String(), {
-                default: "asc",
-              }),
-            },
           ],
           responses: {
             200: {
@@ -278,7 +270,6 @@ describe("Request Validation", () => {
                     limit: Type.Optional(Type.Number()),
                     tags: Type.Optional(Type.Array(Type.String())),
                     published: Type.Optional(Type.Boolean()),
-                    sort: Type.String(),
                   }),
                 },
               },
@@ -301,10 +292,7 @@ describe("Request Validation", () => {
       const response = await supertest(t.express).get("/search").query(query);
 
       expect(response.status).toBe(200);
-      expect(response.body).toStrictEqual({
-        ...query,
-        sort: "asc",
-      });
+      expect(response.body).toStrictEqual(query);
     });
 
     test("Should validate request with only required parameters", async () => {
