@@ -106,7 +106,7 @@ describe("OpenAPI Middleware", () => {
       res.status(204).send();
     });
 
-    t.use("/api", router);
+    t.mount("/api", router);
 
     const response = await request(app)
       .get("/openapi")
@@ -298,7 +298,7 @@ describe("OpenAPI Middleware", () => {
       res.status(204).send();
     });
 
-    t.use("/api", router);
+    t.mount("/api", router);
 
     const response = await request(app).get("/openapi").expect(200);
 

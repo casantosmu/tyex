@@ -55,9 +55,23 @@ export class Tyex {
     };
   }
 
+  /* v8 ignore start */
+  /**
+   * @deprecated For Tyex routers use mount(), for Express middleware use express.use()
+   * @example
+   * app.mount('/api', myTyexRouter)     // Tyex routers
+   * app.express.use(middleware)         // Express middleware
+   */
   use(path: string, router: Router): void;
+  /**
+   * @deprecated For Tyex routers use mount(), for Express middleware use express.use()
+   * @example
+   * app.mount('/api', myTyexRouter)     // Tyex routers
+   * app.express.use(middleware)         // Express middleware
+   */
   use(router: Router): void;
   use(...args: [string, Router] | [Router]) {
+    console.warn("Warning: use() is deprecated. Please use mount() instead.");
     if (args.length === 2) {
       const [path, router] = args;
       this.express.use(path, router._setup(this, path));
@@ -65,6 +79,20 @@ export class Tyex {
       const [router] = args;
       this.express.use(router._setup(this));
     }
+  }
+  /* v8 ignore stop */
+
+  mount(path: string, router: Router): void;
+  mount(router: Router): void;
+  mount(...args: [string, Router] | [Router]) {
+    if (args.length === 2) {
+      const [path, router] = args;
+      this.express.use(path, router._setup(this, path));
+    } else {
+      const [router] = args;
+      this.express.use(router._setup(this));
+    }
+    return this;
   }
 
   get<
