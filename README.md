@@ -60,7 +60,7 @@ app.get(
 ## Installation
 
 ```bash
-npm install tyex
+npm i tyex @sinclair/typebox ajv ajv-formats express
 ```
 
 ## Examples

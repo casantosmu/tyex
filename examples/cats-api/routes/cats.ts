@@ -5,8 +5,8 @@ import { Cat, Error } from "./dtos";
 const router = tyex.Router();
 
 const cats: Static<typeof Cat>[] = [
-  { id: 1, name: "Whiskers", breed: "Persian", age: 5 },
-  { id: 2, name: "Luna", breed: "Siamese", age: 3 },
+  { id: 1, name: "Whiskers", breed: "Persian", age: 5, img: null },
+  { id: 2, name: "Luna", breed: "Siamese", age: 3, img: null },
 ];
 
 router.get(
@@ -18,9 +18,15 @@ router.get(
         in: "query",
         name: "limit",
         required: false,
-        schema: Options(Type.Integer({ minimum: 1, maximum: 100 }), {
-          default: 10,
-        }),
+        schema: Options(
+          Type.Integer({
+            minimum: 1,
+            maximum: 100,
+          }),
+          {
+            default: 10,
+          },
+        ),
       },
     ],
     responses: {
@@ -110,6 +116,7 @@ router.post(
       name: req.body.name,
       breed: req.body.breed,
       age: req.body.age,
+      img: null,
     };
 
     cats.push(newCat);
