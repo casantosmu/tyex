@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import request from "supertest";
 import { Type } from "@sinclair/typebox";
 
-import tyex, { Nullable, Options, StringEnum } from "../src";
+import tyex, { TypeOpenAPI } from "../src";
 import bodyParser from "body-parser";
 
 describe("Options helper", () => {
@@ -18,7 +18,7 @@ describe("Options helper", () => {
             in: "query",
             name: "int",
             required: false,
-            schema: Options(Type.Integer(), {
+            schema: TypeOpenAPI.Options(Type.Integer(), {
               default: defaultInt,
             }),
           },
@@ -61,7 +61,7 @@ describe("Nullable helper", () => {
           content: {
             "application/json": {
               schema: Type.Object({
-                foo: Nullable(Type.String()),
+                foo: TypeOpenAPI.Nullable(Type.String()),
               }),
             },
           },
@@ -72,7 +72,7 @@ describe("Nullable helper", () => {
             content: {
               "application/json": {
                 schema: Type.Object({
-                  foo: Nullable(Type.String()),
+                  foo: TypeOpenAPI.Nullable(Type.String()),
                 }),
               },
             },
@@ -107,7 +107,7 @@ describe("StringEnum helper", () => {
           content: {
             "application/json": {
               schema: Type.Object({
-                foo: StringEnum(["bar", "baz"]),
+                foo: TypeOpenAPI.StringEnum(["bar", "baz"]),
               }),
             },
           },
@@ -118,7 +118,7 @@ describe("StringEnum helper", () => {
             content: {
               "application/json": {
                 schema: Type.Object({
-                  foo: StringEnum(["bar", "baz"]),
+                  foo: TypeOpenAPI.StringEnum(["bar", "baz"]),
                 }),
               },
             },
@@ -151,7 +151,7 @@ describe("StringEnum helper", () => {
           content: {
             "application/json": {
               schema: Type.Object({
-                foo: StringEnum(["bar", "baz"]),
+                foo: TypeOpenAPI.StringEnum(["bar", "baz"]),
               }),
             },
           },
@@ -162,7 +162,7 @@ describe("StringEnum helper", () => {
             content: {
               "application/json": {
                 schema: Type.Object({
-                  foo: StringEnum(["bar", "baz"]),
+                  foo: TypeOpenAPI.StringEnum(["bar", "baz"]),
                 }),
               },
             },

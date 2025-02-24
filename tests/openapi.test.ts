@@ -4,7 +4,7 @@ import SwaggerParser from "@apidevtools/swagger-parser";
 import express from "express";
 import request from "supertest";
 
-import tyex, { Nullable, Options, StringEnum } from "../src";
+import tyex, { TypeOpenAPI } from "../src";
 
 describe("OpenAPI Middleware", () => {
   test("Should serve OpenAPI specification with correct info", async () => {
@@ -211,8 +211,8 @@ describe("OpenAPI Middleware", () => {
     const PetSchema = Type.Object({
       id: Type.Number(),
       name: Type.String(),
-      type: StringEnum(["foo", "bar"]),
-      description: Nullable(Type.String()),
+      type: TypeOpenAPI.StringEnum(["foo", "bar"]),
+      description: TypeOpenAPI.Nullable(Type.String()),
     });
 
     router.get(
@@ -224,7 +224,7 @@ describe("OpenAPI Middleware", () => {
             name: "limit",
             in: "query",
             required: false,
-            schema: Options(Type.Integer(), {
+            schema: TypeOpenAPI.Options(Type.Integer(), {
               default: 10,
             }),
           },

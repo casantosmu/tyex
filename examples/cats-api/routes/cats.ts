@@ -1,5 +1,5 @@
 import { Type, type Static } from "@sinclair/typebox";
-import tyex, { Options } from "../../../src";
+import tyex, { TypeOpenAPI } from "../../../src";
 import { Cat, Error } from "./dtos";
 
 const router = tyex.Router();
@@ -18,7 +18,7 @@ router.get(
         in: "query",
         name: "limit",
         required: false,
-        schema: Options(
+        schema: TypeOpenAPI.Options(
           Type.Integer({
             minimum: 1,
             maximum: 100,

@@ -6,7 +6,7 @@ import {
   Type,
 } from "@sinclair/typebox";
 
-export type TOptions<
+type TOptions<
   Type extends TSchema,
   Options extends Record<PropertyKey, unknown>,
 > = Type & Options;

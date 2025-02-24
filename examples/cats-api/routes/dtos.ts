@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { Nullable, StringEnum } from "../../../src";
+import { TypeOpenAPI } from "../../../src";
 
 export const Error = Type.Object({
   message: Type.String(),
@@ -12,13 +12,13 @@ export const Cat = Type.Object({
   name: Type.String({
     description: "The cat's name",
   }),
-  breed: StringEnum(["Siamese", "Persian", "MaineCoon", "Other"], {
+  breed: TypeOpenAPI.StringEnum(["Siamese", "Persian", "MaineCoon", "Other"], {
     description: "The cat's breed",
   }),
   age: Type.Integer({
     description: "The cat's age in years",
   }),
-  img: Nullable(
+  img: TypeOpenAPI.Nullable(
     Type.String({
       description: "The cat's image URL",
     }),
