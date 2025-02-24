@@ -24,7 +24,7 @@ export class Router {
 
   _setup(tyex: Tyex, prefix?: string) {
     this.#validator = new Validator(tyex.ajv);
-    tyex.routes._addChild(this.#routes, prefix);
+    tyex.routes.addChild(this.#routes, prefix);
     return this.#router;
   }
 

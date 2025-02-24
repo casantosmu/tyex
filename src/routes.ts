@@ -20,7 +20,7 @@ export class Routes {
 
     for (const child of this.#children) {
       routes.push(
-        ...child.routes.#collection.map((route) => ({
+        ...child.routes.get().map((route) => ({
           method: route.method,
           path: child.prefix + route.path,
           definition: route.definition,
@@ -35,7 +35,7 @@ export class Routes {
     this.#collection.push({ method, path, definition: def });
   }
 
-  _addChild(child: Routes, prefix = "") {
+  addChild(child: Routes, prefix = "") {
     this.#children.push({ routes: child, prefix });
   }
 }

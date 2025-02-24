@@ -21,7 +21,7 @@ describe("Routes", () => {
     const def = { responses: {} };
 
     child.add("get", "/users", def);
-    parent._addChild(child, "/api");
+    parent.addChild(child, "/api");
 
     expect(parent.get()).toStrictEqual([
       { method: "get", path: "/api/users", definition: def },
@@ -34,7 +34,7 @@ describe("Routes", () => {
     const def = { responses: {} };
 
     child.add("get", "/users", def);
-    parent._addChild(child);
+    parent.addChild(child);
 
     expect(parent.get()).toStrictEqual([
       { method: "get", path: "/users", definition: def },
@@ -46,7 +46,7 @@ describe("Routes", () => {
     const child = new Routes();
     const def = { responses: {} };
 
-    parent._addChild(child, "/api");
+    parent.addChild(child, "/api");
     child.add("get", "/users", def);
     child.add("post", "/products", def);
 
@@ -62,8 +62,8 @@ describe("Routes", () => {
     const secondChild = new Routes();
     const def = { responses: {} };
 
-    parent._addChild(firstChild, "/api/v1");
-    parent._addChild(secondChild, "/api/v2");
+    parent.addChild(firstChild, "/api/v1");
+    parent.addChild(secondChild, "/api/v2");
 
     firstChild.add("get", "/users", def);
     secondChild.add("get", "/users", def);
@@ -71,6 +71,39 @@ describe("Routes", () => {
     expect(parent.get()).toStrictEqual([
       { method: "get", path: "/api/v1/users", definition: def },
       { method: "get", path: "/api/v2/users", definition: def },
+    ]);
+  });
+
+  test("Should handle nested children (child of child) with single route", () => {
+    const parent = new Routes();
+    const child = new Routes();
+    const grandChild = new Routes();
+    const def = { responses: {} };
+
+    grandChild.add("get", "/profiles", def);
+    child.addChild(grandChild, "/v1");
+    parent.addChild(child, "/api");
+
+    expect(parent.get()).toStrictEqual([
+      { method: "get", path: "/api/v1/profiles", definition: def },
+    ]);
+  });
+
+  test("Should propagate new routes through multiple levels of nesting", () => {
+    const parent = new Routes();
+    const child = new Routes();
+    const grandChild = new Routes();
+    const def = { responses: {} };
+
+    grandChild.add("get", "/profiles", def);
+    child.addChild(grandChild, "/v1");
+    parent.addChild(child, "/api");
+
+    grandChild.add("post", "/settings", def);
+
+    expect(parent.get()).toStrictEqual([
+      { method: "get", path: "/api/v1/profiles", definition: def },
+      { method: "post", path: "/api/v1/settings", definition: def },
     ]);
   });
 });
