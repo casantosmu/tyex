@@ -7,7 +7,7 @@ import { Tyex } from "./tyex";
 
 export type { Tyex };
 export { TyexError, ValidationError } from "./errors";
-export { Options, Nullable } from "./typebox";
+export { Options, Nullable, StringEnum } from "./typebox";
 
 interface Options {
   ajv?: Ajv;

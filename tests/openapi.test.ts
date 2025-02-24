@@ -4,7 +4,7 @@ import SwaggerParser from "@apidevtools/swagger-parser";
 import express from "express";
 import request from "supertest";
 
-import tyex, { Nullable, Options } from "../src";
+import tyex, { Nullable, Options, StringEnum } from "../src";
 
 describe("OpenAPI Middleware", () => {
   test("Should serve OpenAPI specification with correct info", async () => {
@@ -208,6 +208,13 @@ describe("OpenAPI Middleware", () => {
       }),
     );
 
+    const PetSchema = Type.Object({
+      id: Type.Number(),
+      name: Type.String(),
+      type: StringEnum(["foo", "bar"]),
+      description: Nullable(Type.String()),
+    });
+
     router.get(
       "/pets",
       {
@@ -233,14 +240,7 @@ describe("OpenAPI Middleware", () => {
             description: "List of pets",
             content: {
               "application/json": {
-                schema: Type.Array(
-                  Type.Object({
-                    id: Type.Number(),
-                    name: Type.String(),
-                    type: Type.String(),
-                    description: Nullable(Type.String()),
-                  }),
-                ),
+                schema: Type.Array(PetSchema),
               },
             },
           },
@@ -259,10 +259,7 @@ describe("OpenAPI Middleware", () => {
           required: true,
           content: {
             "application/json": {
-              schema: Type.Object({
-                name: Type.String(),
-                type: Type.String(),
-              }),
+              schema: Type.Omit(PetSchema, ["id"]),
             },
           },
         },
@@ -271,11 +268,7 @@ describe("OpenAPI Middleware", () => {
             description: "Pet created",
             content: {
               "application/json": {
-                schema: Type.Object({
-                  id: Type.Number(),
-                  name: Type.String(),
-                  type: Type.String(),
-                }),
+                schema: PetSchema,
               },
             },
           },
