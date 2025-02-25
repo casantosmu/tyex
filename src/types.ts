@@ -77,7 +77,8 @@ export type Handler<
       [MediaType in keyof ReqBodyContent]: ReqBodyContent[MediaType]["schema"] extends TSchema
         ? ReqBodyRequired extends true
           ? Static<ReqBodyContent[MediaType]["schema"]>
-          : Static<ReqBodyContent[MediaType]["schema"]> | Record<string, never>
+          : // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+            Static<ReqBodyContent[MediaType]["schema"]> | {}
         : never;
     }[keyof ReqBodyContent],
     {

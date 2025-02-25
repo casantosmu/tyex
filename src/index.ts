@@ -4,10 +4,12 @@ import addFormats from "ajv-formats";
 
 import { Router } from "./router";
 import { Tyex } from "./tyex";
+import { Options, Nullable, StringEnum } from "./typebox";
 
 export type { Tyex };
 export { TyexError, ValidationError } from "./errors";
-export { Options, Nullable } from "./typebox";
+
+export const TypeOpenAPI = { Options, Nullable, StringEnum };
 
 interface Options {
   ajv?: Ajv;

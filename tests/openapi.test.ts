@@ -4,7 +4,7 @@ import SwaggerParser from "@apidevtools/swagger-parser";
 import express from "express";
 import request from "supertest";
 
-import tyex from "../src";
+import tyex, { TypeOpenAPI } from "../src";
 
 describe("OpenAPI Middleware", () => {
   test("Should serve OpenAPI specification with correct info", async () => {
@@ -106,7 +106,7 @@ describe("OpenAPI Middleware", () => {
       res.status(204).send();
     });
 
-    t.use("/api", router);
+    t.mount("/api", router);
 
     const response = await request(app)
       .get("/openapi")
@@ -208,6 +208,13 @@ describe("OpenAPI Middleware", () => {
       }),
     );
 
+    const PetSchema = Type.Object({
+      id: Type.Number(),
+      name: Type.String(),
+      type: TypeOpenAPI.StringEnum(["foo", "bar"]),
+      description: TypeOpenAPI.Nullable(Type.String()),
+    });
+
     router.get(
       "/pets",
       {
@@ -217,7 +224,9 @@ describe("OpenAPI Middleware", () => {
             name: "limit",
             in: "query",
             required: false,
-            schema: Type.Number(),
+            schema: TypeOpenAPI.Options(Type.Integer(), {
+              default: 10,
+            }),
           },
           {
             name: "type",
@@ -231,13 +240,7 @@ describe("OpenAPI Middleware", () => {
             description: "List of pets",
             content: {
               "application/json": {
-                schema: Type.Array(
-                  Type.Object({
-                    id: Type.Number(),
-                    name: Type.String(),
-                    type: Type.String(),
-                  }),
-                ),
+                schema: Type.Array(PetSchema),
               },
             },
           },
@@ -256,10 +259,7 @@ describe("OpenAPI Middleware", () => {
           required: true,
           content: {
             "application/json": {
-              schema: Type.Object({
-                name: Type.String(),
-                type: Type.String(),
-              }),
+              schema: Type.Omit(PetSchema, ["id"]),
             },
           },
         },
@@ -268,11 +268,7 @@ describe("OpenAPI Middleware", () => {
             description: "Pet created",
             content: {
               "application/json": {
-                schema: Type.Object({
-                  id: Type.Number(),
-                  name: Type.String(),
-                  type: Type.String(),
-                }),
+                schema: PetSchema,
               },
             },
           },
@@ -298,7 +294,7 @@ describe("OpenAPI Middleware", () => {
       res.status(204).send();
     });
 
-    t.use("/api", router);
+    t.mount("/api", router);
 
     const response = await request(app).get("/openapi").expect(200);
 

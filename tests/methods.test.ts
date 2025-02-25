@@ -221,7 +221,7 @@ describe("Router methods", () => {
   test.each(methods)("Should handle %s requests", async (method) => {
     const t = tyex();
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const json = { message: "success" };
 
@@ -253,7 +253,7 @@ describe("Router methods", () => {
   test("Should execute middlewares in order", async () => {
     const t = tyex();
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const order: number[] = [];
 
@@ -285,7 +285,7 @@ describe("Router methods", () => {
   test("Should handle resolved promises on handlers", async () => {
     const t = tyex();
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const json = { message: "success" };
 
@@ -319,7 +319,7 @@ describe("Router methods", () => {
     const t = tyex();
     const app = t.express;
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const error = new Error("rejection");
 
@@ -362,7 +362,7 @@ describe("Router methods without definition", () => {
   test.each(methods)("Should handle %s requests", async (method) => {
     const t = tyex();
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const json = { message: "success" };
 
@@ -379,7 +379,7 @@ describe("Router methods without definition", () => {
   test("Should execute middlewares in order", async () => {
     const t = tyex();
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const order: number[] = [];
 
@@ -408,7 +408,7 @@ describe("Router methods without definition", () => {
   test("Should handle resolved promises on handlers", async () => {
     const t = tyex();
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const json = { message: "success" };
 
@@ -427,7 +427,7 @@ describe("Router methods without definition", () => {
     const t = tyex();
     const app = t.express;
     const router = tyex.Router();
-    t.use(router);
+    t.mount(router);
 
     const error = new Error("rejection");
 

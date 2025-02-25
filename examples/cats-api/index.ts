@@ -28,7 +28,7 @@ app.use(
 );
 
 app.use(express.json());
-t.use("/api/cats", catsRoutes);
+t.mount("/api/cats", catsRoutes);
 
 app.use(errorHandler);
 
