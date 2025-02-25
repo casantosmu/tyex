@@ -689,8 +689,14 @@ describe("Request Validation", () => {
           },
         },
         (req, res) => {
-          // @ts-expect-error body is optional
-          res.status(201).json(req.body);
+          res.status(201).json({
+            // @ts-expect-error req.body is optional
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            email: req.body.email,
+            // @ts-expect-error req.body is optional
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            name: req.body.name,
+          });
         },
       );
       t.express.use(errorHandler);
