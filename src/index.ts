@@ -1,8 +1,5 @@
-import type { RequestHandler } from "express";
+import { handler } from "./handler";
 
-export default function tyex() {
-  const tyex: RequestHandler = (req, res, next) => {
-    next();
-  };
-  return tyex;
-}
+const tyex = { handler };
+
+export default tyex;
