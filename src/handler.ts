@@ -4,7 +4,7 @@ import type {
   NextFunction,
   RequestHandler,
 } from "express-serve-static-core";
-import type { OpenAPIV3 } from "openapi-types";
+import type { OperationObject } from "./types";
 
 const DEF_SYMBOL = Symbol("tyex_def");
 
@@ -16,7 +16,7 @@ export const getDef = (handler: RequestHandler) => {
 };
 
 export const handler = (
-  def: OpenAPIV3.OperationObject,
+  def: OperationObject,
   handler: (
     req: Request,
     res: Response,
