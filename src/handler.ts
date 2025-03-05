@@ -4,6 +4,8 @@ import type {
   NextFunction,
   RequestHandler,
 } from "express-serve-static-core";
+import { reqSchema } from "./req-schema";
+import { reqValidation } from "./req-validation";
 import type { OperationObject } from "./types";
 
 const DEF_SYMBOL = Symbol("tyex_def");
@@ -23,7 +25,16 @@ export const handler = (
     next: NextFunction,
   ) => Promise<void> | void,
 ) => {
+  const schema = reqSchema(def);
+  const validation = reqValidation(schema);
+
   const handle = (req: Request, res: Response, next: NextFunction) => {
+    const result = validation(req);
+    if (!result.success) {
+      next(result.error);
+      return;
+    }
+
     Promise.resolve(handler(req, res, next)).catch(next);
   };
 

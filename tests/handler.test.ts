@@ -3,6 +3,7 @@ import express, {
   type Request,
   type Response,
   type NextFunction,
+  type RequestHandler,
 } from "express";
 import request from "supertest";
 import tyex from "../src";
@@ -32,11 +33,11 @@ describe("handler", () => {
   });
 
   test("getDef should return undefined for regular handlers", () => {
-    const def = getDef((req, res) => {
+    const handler: RequestHandler = (req, res) => {
       res.send("OK");
-    });
+    };
 
-    expect(def).toBeUndefined();
+    expect(getDef(handler)).toBeUndefined();
   });
 
   test("should work with synchronous handlers", async () => {
@@ -117,5 +118,48 @@ describe("handler", () => {
 
     expect(response.status).toBe(500);
     expect(response.text).toBe("Error caught");
+  });
+
+  test("should pass validation errors to next middleware", async () => {
+    const app = express();
+
+    app.get(
+      "/",
+      tyex.handler(
+        {
+          parameters: [
+            {
+              name: "param",
+              in: "query",
+              required: true,
+              schema: Type.String(),
+            },
+          ],
+          responses: {
+            "200": {
+              description: "Successful response",
+              content: {
+                "text/plain": {
+                  schema: Type.String(),
+                },
+              },
+            },
+          },
+        },
+        (req, res) => {
+          res.send("Should not reach here");
+        },
+      ),
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      res.status(400).send("Validation error");
+    });
+
+    const response = await request(app).get("/");
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe("Validation error");
   });
 });
