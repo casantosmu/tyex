@@ -6,7 +6,13 @@ import type {
 } from "express-serve-static-core";
 import { reqSchema } from "./req-schema";
 import { reqValidation } from "./req-validation";
-import type { OperationObject } from "./types";
+import type {
+  ContentObject,
+  Handler,
+  OperationObject,
+  ParameterObject,
+  ResponsesObject,
+} from "./types.d.ts";
 
 const DEF_SYMBOL = Symbol("tyex_def");
 
@@ -17,13 +23,14 @@ export const getDef = (handler: RequestHandler) => {
   return undefined;
 };
 
-export const handler = (
-  def: OperationObject,
-  handler: (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => Promise<void> | void,
+export const handler = <
+  const Params extends ParameterObject[],
+  Responses extends ResponsesObject,
+  ReqBodyContent extends ContentObject,
+  ReqBodyRequired extends boolean,
+>(
+  def: OperationObject<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+  handler: Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
 ) => {
   const schema = reqSchema(def);
   const validation = reqValidation(schema);
@@ -35,6 +42,7 @@ export const handler = (
       return;
     }
 
+    // @ts-expect-error express types can not infer runtime modifications
     Promise.resolve(handler(req, res, next)).catch(next);
   };
 

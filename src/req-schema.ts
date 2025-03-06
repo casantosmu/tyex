@@ -1,4 +1,4 @@
-import type { OperationObject } from "./types";
+import type { OperationObject } from "./types.d.ts";
 
 interface RequestSchema {
   type: string;
