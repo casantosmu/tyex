@@ -1,55 +1,59 @@
 import type { Static, TSchema } from "@sinclair/typebox";
 import type { NextFunction, Request, Response } from "express";
-
-export type Method = "get" | "post" | "put" | "delete";
-
-// TODO:
-// - If schema.default then required != true
-// - typeof schema.default == schema.type
-export type ParameterObject<Schema extends TSchema = TSchema> = {
-  name: string;
-  description?: string;
-  deprecated?: boolean;
-  schema?: Schema;
-  example?: unknown;
-} & (
-  | {
-      in: "query" | "header" | "cookie";
-      required?: boolean;
-    }
-  | {
-      /** If the parameter location is "path", required prop is REQUIRED and its value MUST be true. */
-      in: "path";
-      required: true;
-    }
-);
+import type { OpenAPIV3 } from "openapi-types";
 
 export type ContentObject<Schema extends TSchema = TSchema> = Record<
   string,
   {
     schema?: Schema;
     example?: unknown;
+    examples?: Record<
+      string,
+      OpenAPIV3.ReferenceObject | OpenAPIV3.ExampleObject
+    >;
+    encoding?: Record<string, OpenAPIV3.EncodingObject>;
   }
 >;
+
+export interface ParameterObject<Schema extends TSchema = TSchema> {
+  name: string;
+  in: string;
+
+  description?: string;
+  required?: boolean;
+  deprecated?: boolean;
+  allowEmptyValue?: boolean;
+  style?: string;
+  explode?: boolean;
+  allowReserved?: boolean;
+  schema?: Schema;
+  example?: unknown;
+  examples?: Record<
+    string,
+    OpenAPIV3.ReferenceObject | OpenAPIV3.ExampleObject
+  >;
+  content?: ContentObject;
+}
 
 export type ResponsesObject = Record<
   string,
   {
     description: string;
+    headers?: Record<
+      string,
+      OpenAPIV3.ReferenceObject | OpenAPIV3.HeaderObject
+    >;
     content?: ContentObject;
+    links?: Record<string, OpenAPIV3.ReferenceObject | OpenAPIV3.LinkObject>;
   }
 >;
 
-export interface RouteDefinition<
+export interface OperationObject<
   Params extends ParameterObject[] = ParameterObject[],
   Responses extends ResponsesObject = ResponsesObject,
   ReqBodyContent extends ContentObject = ContentObject,
   ReqBodyRequired extends boolean = boolean,
-> {
-  tags?: string[];
-  summary?: string;
-  description?: string;
-  operationId?: string;
+> extends OpenAPIV3.OperationObject {
   parameters?: Params;
   requestBody?: {
     description?: string;
@@ -57,11 +61,10 @@ export interface RouteDefinition<
     required?: ReqBodyRequired;
   };
   responses: Responses;
-  deprecated?: boolean;
 }
 
 export type Handler<
-  Params extends ParameterObject[] = ParameterObject[],
+  const Params extends ParameterObject[] = ParameterObject[],
   Responses extends ResponsesObject = ResponsesObject,
   ReqBodyContent extends ContentObject = ContentObject,
   ReqBodyRequired extends boolean = boolean,
@@ -70,7 +73,13 @@ export type Handler<
     {
       [P in Params[number] as P["in"] extends "path"
         ? P["name"]
-        : never]: P["schema"] extends TSchema ? Static<P["schema"]> : never;
+        : never]: P["schema"] extends TSchema
+        ? P["required"] extends true
+          ? Static<P["schema"]>
+          : P["schema"] extends { default: unknown }
+            ? Static<P["schema"]>
+            : Static<P["schema"]> | undefined
+        : never;
     },
     unknown,
     {
@@ -106,36 +115,3 @@ export type Handler<
   >,
   next: NextFunction,
 ) => void | Promise<void>;
-
-export type ReqHandler = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  req: Request<any, any, any, any>,
-  res: Response,
-  next: NextFunction,
-) => void | Promise<void>;
-
-export interface OpenAPI {
-  openapi: string;
-  info: {
-    title: string;
-    description?: string;
-    termsOfService?: string;
-    contact?: {
-      name?: string;
-      url?: string;
-      email?: string;
-    };
-    license?: {
-      name: string;
-      url?: string;
-    };
-    version: string;
-  };
-  servers?: {
-    url: string;
-    description?: string;
-  }[];
-  paths: Record<string, Record<string, unknown>>;
-}
-
-export type OpenAPIBase = Omit<OpenAPI, "openapi" | "paths">;

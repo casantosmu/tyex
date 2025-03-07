@@ -1,76 +1,187 @@
-# tyex 🚀
+# tyex
 
-Type-safe Express.js routes with automatic OpenAPI documentation generation. Zero config, zero hassle.
+**Type Safety Layer for Express APIs**  
+_Runtime Validation • OpenAPI Docs • Full Type Inference_
 
 ![npm](https://img.shields.io/npm/v/tyex)
 ![license](https://img.shields.io/npm/l/tyex)
 [![codecov](https://codecov.io/gh/casantosmu/tyex/graph/badge.svg?token=5IoSRdzqjN)](https://codecov.io/gh/casantosmu/tyex)
+![CI](https://github.com/casantosmu/tyex/actions/workflows/pr-checks.yaml/badge.svg)
 
 ## Why tyex?
 
-- ✨ **Full Type Safety**: Leverage TypeScript's type system for your Express routes
-- 📚 **Automatic OpenAPI**: Generate OpenAPI documentation directly from your route definitions
-- 🛡️ **Runtime Validation**: Uses AJV for runtime type checking
-- 🔌 **Express Compatible**: Drop-in replacement for Express Router
-- 🪶 **Lightweight**: Minimal overhead, maximum value
+Building Express APIs involves three tedious, duplicated tasks:
 
-## Quick Start
+- **Type definitions** for your request/response objects
+- **Runtime validation** to ensure incoming data is valid
+- **API documentation** for consumers to understand your endpoints
 
-```typescript
-import { Type } from "@sinclair/typebox";
-import tyex from "tyex";
+Keeping these in sync is a maintenance nightmare. Instead of juggling multiple libraries and duplicating schemas, `tyex` lets you define everything once and get all three benefits automatically.
 
-const app = tyex();
+## Features
 
-// Serve OpenAPI documentation
-app.express.use(
-  "/openapi.json",
-  app.openapi({
-    info: {
-      title: "My API",
-      version: "1.0.0",
-    },
-  }),
-);
-
-// Define your route with types and documentation in one place
-app.get(
-  "/hello",
-  {
-    summary: "Say hello",
-    responses: {
-      200: {
-        description: "Success",
-        content: {
-          "application/json": {
-            schema: Type.Object({
-              message: Type.String(),
-            }),
-          },
-        },
-      },
-    },
-  },
-  (req, res) => {
-    res.json({ message: "Hello, World!" });
-  },
-);
-```
+- 🔄 **Single source of truth** for types, validation, and documentation
+- 🚀 **No new frameworks** to learn - it's just Express
+- 🔍 **Full TypeScript inference** for request params, query, and body
+- ✅ **Runtime validation** with automatic coercion (strings to numbers, etc.)
+- 📚 **OpenAPI documentation** auto-generated from your handlers
+- 🔌 **Async handler support** with proper error handling
 
 ## Installation
 
 ```bash
-npm i tyex @sinclair/typebox ajv ajv-formats express
+npm install tyex @sinclair/typebox
 ```
 
-## Examples
+## Quick Start
 
-Check out our [example project](./examples/cats-api) for a complete CRUD API implementation.
+```typescript
+import express from "express";
+import tyex from "tyex";
+import { Type } from "@sinclair/typebox";
+import swaggerUi from "swagger-ui-express";
 
-## Contributing
+const app = express();
+app.use(express.json());
 
-PRs are welcome! For major changes, please open an issue first to discuss what you would like to change.
+// Define your schema with TypeBox
+const UserSchema = Type.Object({
+  id: Type.Integer(),
+  username: Type.String(),
+});
+
+// Create a route with tyex.handler
+app.get(
+  "/api/users/:id",
+  tyex.handler(
+    {
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: Type.Integer(),
+        },
+      ],
+      responses: {
+        "200": {
+          description: "User details",
+          content: {
+            "application/json": {
+              schema: UserSchema,
+            },
+          },
+        },
+      },
+    },
+    async (req, res) => {
+      const user = await getUser(req.params.id);
+      res.json(user);
+    },
+  ),
+);
+
+// Add OpenAPI documentation endpoint
+app.get("/api-spec", tyex.openapi());
+
+// Optional: Add Swagger UI
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(null, { swaggerOptions: { url: "/api-spec" } }),
+);
+
+app.listen(3000);
+```
+
+## How It Works
+
+### Define Routes with OpenAPI Schema
+
+The `tyex.handler` function wraps your Express handlers with two key benefits:
+
+1. **Type-checking** - Your handler receives fully typed request objects
+2. **Runtime validation** - Incoming requests are validated against your schema
+
+```typescript
+tyex.handler(
+  {
+    // OpenAPI 3 operation object
+    parameters: [...],
+    requestBody: {...},
+    responses: {...},
+  },
+  (req, res) => {
+    // Your regular Express handler
+  }
+)
+```
+
+### Generate OpenAPI Documentation
+
+The `tyex.openapi()` middleware automatically generates an OpenAPI document from your handlers:
+
+```typescript
+// Basic usage
+app.get("/api-spec", tyex.openapi());
+
+// With additional configuration
+app.get(
+  "/api-spec",
+  tyex.openapi({
+    document: {
+      openapi: "3.0.3",
+      info: {
+        title: "My API",
+        version: "1.0.0",
+      },
+      servers: [
+        {
+          url: "https://api.example.com",
+        },
+      ],
+    },
+  }),
+);
+```
+
+### OpenAPI-Specific Types
+
+Since OpenAPI schemas are a superset of JSON Schema, `tyex` provides helper functions for common OpenAPI-specific patterns:
+
+```typescript
+import { TypeOpenAPI } from "tyex";
+
+TypeOpenAPI.Nullable(Type.String()); // { type: 'string', nullable: true }
+TypeOpenAPI.StringEnum(["admin", "user"]); // enum: ['admin', 'user']
+TypeOpenAPI.Options(Type.Number(), { default: 10 }); // Default values with proper type inference
+```
+
+### Error Handling
+
+Validation errors are passed to Express's error handling middleware:
+
+```typescript
+import { ValidationError } from "tyex";
+
+app.use((err, req, res, next) => {
+  if (err instanceof ValidationError) {
+    res.status(400).json({ errors: err.errors });
+    return;
+  }
+  next(err);
+});
+```
+
+## Complete Examples
+
+See the [examples directory](examples) for full working examples, including the "kitchen sink" example with authentication, error handling, and more.
+
+## Current Limitations
+
+- Only `application/json` request bodies are supported currently
+- Response schemas are used for types and documentation, but aren't validated
 
 ## License
 
-MIT
+[MIT](LICENSE)
