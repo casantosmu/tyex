@@ -13,14 +13,22 @@ const getStack = (app: Application) => {
   let stack = app.stack as ILayer[] | undefined;
   if (!stack) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    stack = app._router.stack as ILayer[];
+    stack = app._router?.stack as ILayer[] | undefined;
   }
   return stack;
 };
 
-const extractPathFromRegex = (regexp: string) => {
-  const match = /\^\\\/([\w-]+)\\\/\?/.exec(regexp);
-  return match ? `/${match[1]}` : "";
+const extractPathFromRegex = (regexp: RegExp) => {
+  const match =
+    /^\/\^((?:\\[.*+?^${}()|[\]\\/]|[^.*+?^${}()|[\]\\/])*)\$\//.exec(
+      regexp.toString().replace("\\/?", "").replace("(?=\\/|$)", "$"),
+    );
+
+  if (match?.[1]) {
+    return match[1].replace(/\\(.)/g, "$1");
+  }
+
+  return "";
 };
 
 export const oasGenerator = (
@@ -30,6 +38,10 @@ export const oasGenerator = (
 ) => {
   oas = initOAS(oas);
   const stack = getStack(app);
+
+  if (!stack) {
+    return oas;
+  }
 
   for (const item of stack) {
     if (item.route) {
@@ -52,9 +64,12 @@ export const oasGenerator = (
         [handler.method]: def,
       };
     } else if (item.name === "router") {
-      const path = basePath + extractPathFromRegex(item.regexp.toString());
+      const path = basePath + extractPathFromRegex(item.regexp);
       // @ts-expect-error Express internals - item.handle types are not properly exposed
       oas = oasGenerator(item.handle, oas, path);
+    } else if (item.name === "mounted_app") {
+      const path = basePath + extractPathFromRegex(item.regexp);
+      console.warn(`Cannot process mounted_app at path "${path}"`);
     }
   }
 

@@ -184,4 +184,42 @@ describe("oas generator", () => {
     expect(oas.paths).toHaveProperty("/api/resource/with");
     expect(oas.paths).not.toHaveProperty("/api/resource/without");
   });
+
+  test("should handle empty Express app with no routes", () => {
+    const app = express();
+
+    const oas = oasGenerator(app, baseOAS);
+
+    expect(oas.paths).toStrictEqual({});
+  });
+
+  test("should extract paths from Express Router with multi-segment path prefix", () => {
+    const router = express.Router();
+
+    router.get(
+      "/",
+      tyex.handler({ responses: {} }, (req, res) => {
+        res.send();
+      }),
+    );
+
+    const app = express();
+    app.use("/api/resource", router);
+
+    const oas = oasGenerator(app, baseOAS);
+
+    expect(oas.paths).toHaveProperty("/api/resource/");
+  });
+
+  test("should ignore paths when encountering mounted_app", () => {
+    const app = express();
+    const subApp = express();
+
+    subApp.get("/", (req, res) => res.send());
+    app.use("/sub-app", subApp);
+
+    const oas = oasGenerator(app, baseOAS);
+
+    expect(oas.paths).toStrictEqual({});
+  });
 });
