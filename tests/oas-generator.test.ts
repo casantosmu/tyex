@@ -175,7 +175,9 @@ describe("oas generator", () => {
       }),
     );
 
-    app.get("/api/resource/without", (req, res) => res.send());
+    app.get("/api/resource/without", (req, res) => {
+      res.send();
+    });
 
     const oas = oasGenerator(app, baseOAS);
 

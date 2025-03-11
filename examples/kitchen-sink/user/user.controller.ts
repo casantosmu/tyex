@@ -128,15 +128,13 @@ const userController = {
 
       if (!isAdmin) {
         const error = "You don't have permission to perform this action";
-        res.status(401).json({ error });
-        return;
+        return res.status(401).json({ error });
       }
 
       const user = users.find((user) => user.id === req.params.id);
       if (!user) {
         const error = "User not found";
-        res.status(404).json({ error });
-        return;
+        return res.status(404).json({ error });
       }
 
       user.deletedAt = new Date().toISOString();

@@ -4,14 +4,12 @@ export const authenticate: RequestHandler = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   const token = authHeader.split(" ")[1];
   if (token !== "secret-token") {
-    res.status(401).json({ error: "Invalid token" });
-    return;
+    return res.status(401).json({ error: "Invalid token" });
   }
 
   req.user = { isAdmin: true };
