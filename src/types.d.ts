@@ -114,4 +114,4 @@ export type Handler<
     }[keyof Responses]
   >,
   next: NextFunction,
-) => void | Promise<void>;
+) => unknown;

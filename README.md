@@ -166,8 +166,7 @@ import { ValidationError } from "tyex";
 
 app.use((err, req, res, next) => {
   if (err instanceof ValidationError) {
-    res.status(400).json({ errors: err.errors });
-    return;
+    return res.status(400).json({ errors: err.errors });
   }
   next(err);
 });
