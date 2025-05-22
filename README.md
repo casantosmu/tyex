@@ -4,6 +4,7 @@
 _Runtime Validation • OpenAPI Docs • Full Type Inference_
 
 ![npm](https://img.shields.io/npm/v/tyex)
+![Static Badge](https://img.shields.io/badge/express->=5.0.0-blue)
 ![license](https://img.shields.io/npm/l/tyex)
 [![codecov](https://codecov.io/gh/casantosmu/tyex/graph/badge.svg?token=5IoSRdzqjN)](https://codecov.io/gh/casantosmu/tyex)
 ![CI](https://github.com/casantosmu/tyex/actions/workflows/pr-checks.yaml/badge.svg)

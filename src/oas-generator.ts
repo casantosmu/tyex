@@ -14,6 +14,11 @@ const getStack = (app: Application) => {
   if (!stack) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     stack = app._router?.stack as ILayer[] | undefined;
+
+    // For Express 5.x but this doesn't get the router path for nested
+    if (!stack) {
+      stack = app.router?.stack as ILayer[] | undefined;
+    }
   }
   return stack;
 };
