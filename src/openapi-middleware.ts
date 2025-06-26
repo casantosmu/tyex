@@ -7,18 +7,7 @@ export interface Options {
 }
 
 export const openapiMiddleware = (options?: Options): RequestHandler => {
-  let base = options?.document;
-  if (!base) {
-    base = {
-      openapi: "3.0.0",
-      info: {
-        title: "ExpressJS",
-        version: "0.0.0",
-      },
-    };
-  }
-  const oas = { ...base, paths: {} };
   return (req, res) => {
-    res.json(oasGenerator(req.app, oas));
+    res.json(oasGenerator(req.app, options?.document));
   };
 };

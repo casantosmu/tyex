@@ -2,10 +2,28 @@ import type { Application, ILayer } from "express-serve-static-core";
 import { OpenAPIV3 } from "openapi-types";
 import { getDef } from "./handler";
 
-const initOAS = (oas: OpenAPIV3.Document) => {
+const initOAS = (
+  oas?: OpenAPIV3.Document | Omit<OpenAPIV3.Document, "paths">,
+) => {
+  if (!oas) {
+    return {
+      openapi: "3.0.0",
+      info: {
+        title: "ExpressJS",
+        version: "0.0.0",
+      },
+      paths: {},
+    };
+  }
+  if ("paths" in oas) {
+    return {
+      ...oas,
+      paths: { ...oas.paths },
+    };
+  }
   return {
     ...oas,
-    paths: { ...oas.paths },
+    paths: {},
   };
 };
 
@@ -31,12 +49,19 @@ const extractPathFromRegex = (regexp: RegExp) => {
   return "";
 };
 
+/**
+ * Generates an OpenAPI v3 document by introspecting an Express application's routes.
+ *
+ * @param app The Express application instance. The generator will scan its route stack for handlers created with `tyex.handler`.
+ * @param baseOAS An optional base OpenAPI document. The generator will merge the auto-discovered paths into this document.
+ * @returns The complete OpenAPI document as a JavaScript object.
+ */
 export const oasGenerator = (
   app: Application,
-  oas: OpenAPIV3.Document,
+  baseOAS?: OpenAPIV3.Document | Omit<OpenAPIV3.Document, "paths">,
   basePath = "",
 ) => {
-  oas = initOAS(oas);
+  let oas = initOAS(baseOAS);
   const stack = getStack(app);
 
   if (!stack) {
