@@ -117,9 +117,11 @@ tyex.handler(
 )
 ```
 
-### Generate OpenAPI Documentation
+### Generating OpenAPI Documentation
 
-The `tyex.openapi()` middleware automatically generates an OpenAPI document from your handlers:
+#### Option 1: Using the Middleware
+
+The `tyex.openapi()` middleware provides a quick way to expose your documentation on a route. It generates the spec on the first request.
 
 ```typescript
 // Basic usage
@@ -143,6 +145,24 @@ app.get(
     },
   }),
 );
+```
+
+#### Option 2: Programmatic Generation
+
+For more flexibility, you can generate the OpenAPI document directly as a JavaScript object using `oasGenerator`. This allows you to use the spec in build scripts, tests, or apply complex logic before serving it.
+
+```typescript
+// scripts/build-spec.js
+import app from "../src/app";
+import tyex from "tyex";
+import fs from "fs";
+
+// Generate the document object
+const oasDoc = tyex.oasGenerator(app);
+
+// Write it to a file
+fs.writeFileSync("./public/openapi.json", JSON.stringify(oasDoc));
+console.log("✅ OpenAPI spec generated successfully.");
 ```
 
 ### OpenAPI-Specific Types

@@ -3,11 +3,16 @@ import type { OpenAPIV3 } from "openapi-types";
 import { oasGenerator } from "./oas-generator";
 
 export interface Options {
-  document?: Omit<OpenAPIV3.Document, "paths">;
+  document?: OpenAPIV3.Document | Omit<OpenAPIV3.Document, "paths">;
 }
 
 export const openapiMiddleware = (options?: Options): RequestHandler => {
+  let cache: OpenAPIV3.Document | undefined;
   return (req, res) => {
-    res.json(oasGenerator(req.app, options?.document));
+    if (!cache) {
+      cache = oasGenerator(req.app, options?.document);
+    }
+
+    res.json(cache);
   };
 };
