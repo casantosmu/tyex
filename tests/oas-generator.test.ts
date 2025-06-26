@@ -222,4 +222,57 @@ describe("oas generator", () => {
 
     expect(oas.paths).toStrictEqual({});
   });
+
+  test("should create a default OAS document when baseOAS is undefined", () => {
+    const app = express();
+
+    const oas = oasGenerator(app);
+
+    expect(oas).toEqual({
+      openapi: "3.0.0",
+      info: {
+        title: "ExpressJS",
+        version: "0.0.0",
+      },
+      paths: {},
+    });
+  });
+
+  test("should add an empty paths object if baseOAS is provided without one", () => {
+    const app = express();
+
+    const baseOAS = {
+      openapi: "3.0.1",
+      info: {
+        title: "API Without Paths",
+        version: "1.2.3",
+      },
+    };
+
+    const oas = oasGenerator(app, baseOAS);
+
+    expect(oas).toEqual({
+      ...baseOAS,
+      paths: {},
+    });
+  });
+
+  test("should use paths object if baseOAS is provided with one", () => {
+    const app = express();
+
+    const baseOAS = {
+      openapi: "3.0.1",
+      info: {
+        title: "My Custom API",
+        version: "1.0.0",
+      },
+      paths: {
+        "/existing-path": {},
+      },
+    };
+
+    const oas = oasGenerator(app, baseOAS);
+
+    expect(oas).toStrictEqual(baseOAS);
+  });
 });

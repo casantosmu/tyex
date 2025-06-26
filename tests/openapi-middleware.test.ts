@@ -45,26 +45,4 @@ describe("openapi middleware", () => {
       },
     });
   });
-
-  test("should incorporate base document", async () => {
-    const app = express();
-    const document = {
-      openapi: "3.0.0",
-      info: {
-        title: "Test API",
-        version: "1.0.0",
-        description: "API for testing",
-      },
-    };
-
-    app.use("/openapi.json", tyex.openapi({ document }));
-
-    const response = await request(app).get("/openapi.json");
-
-    expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
-      ...document,
-      paths: {},
-    });
-  });
 });
