@@ -1,6 +1,6 @@
 {
   "name": "tyex",
-  "version": "0.12.2",
+  "version": "0.13.0",
   "description": "Type-safe Express.js routes with automatic OpenAPI documentation generation.",
   "type": "module",
   "author": "Carlos Santos <contact@casantosmu.com>",
