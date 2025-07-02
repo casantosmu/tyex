@@ -34,13 +34,13 @@ const ajv = addFormats(
   ],
 );
 
-export class ValidationError {
+export class ValidationError extends Error {
   status = 400;
   code = "VALIDATION_ERROR";
-  message = "Validation error";
   errors: ErrorObject[];
 
-  constructor(errors: ErrorObject[]) {
+  constructor(errors: ErrorObject[], options?: ErrorOptions) {
+    super("Validation error", options);
     this.errors = errors;
   }
 }
