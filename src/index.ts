@@ -5,6 +5,8 @@ import { openapiMiddleware } from "./openapi-middleware";
 export { TypeOpenAPI } from "./oas-type";
 export { ValidationError } from "./req-validation";
 
+export type * from "./types";
+
 const tyex = {
   handler,
   openapi: openapiMiddleware,

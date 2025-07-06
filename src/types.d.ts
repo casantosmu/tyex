@@ -64,6 +64,7 @@ export interface OperationObject<
 }
 
 export type Handler<
+  Locals extends Record<string, unknown> = Record<string, unknown>,
   const Params extends ParameterObject[] = ParameterObject[],
   Responses extends ResponsesObject = ResponsesObject,
   ReqBodyContent extends ContentObject = ContentObject,
@@ -100,7 +101,8 @@ export type Handler<
             ? Static<P["schema"]>
             : Static<P["schema"]> | undefined
         : never;
-    }
+    },
+    Locals
   >,
   res: Response<
     {
