@@ -24,13 +24,14 @@ export const getDef = (handler: RequestHandler) => {
 };
 
 export const handler = <
+  Locals extends Record<string, unknown>,
   const Params extends ParameterObject[],
   Responses extends ResponsesObject,
   ReqBodyContent extends ContentObject,
   ReqBodyRequired extends boolean,
 >(
   def: OperationObject<Params, Responses, ReqBodyContent, ReqBodyRequired>,
-  handler: Handler<Params, Responses, ReqBodyContent, ReqBodyRequired>,
+  handler: Handler<Locals, Params, Responses, ReqBodyContent, ReqBodyRequired>,
 ) => {
   const schema = reqSchema(def);
   const validation = reqValidation(schema);
