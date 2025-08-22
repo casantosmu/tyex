@@ -31,10 +31,11 @@ app.use(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ValidationError) {
-    return res.status(400).json({
+    res.status(400).json({
       error: "Validation Error",
       details: err.errors,
     });
+    return;
   }
 
   console.error(err);
